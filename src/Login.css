@@ -1,0 +1,193 @@
+.login-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #18181a 60%, #2d2d2d 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#particles-js {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+.glass-card {
+  background: rgba(255, 255, 255, 0.1); /* 半透明背景 */
+  backdrop-filter: blur(35px);          /* 背景模糊 */
+  -webkit-backdrop-filter: blur(35px);  /* 兼容 Safari */
+  border-radius: 16px;                  /* 圆角 */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* 边框增加层次感 */
+  /* box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);  */
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  box-shadow:
+  inset 0 0 30px rgba(255, 255, 255, 0.05),  /* 内阴影柔化边缘 */
+  0 4px 20px rgba(0, 0, 0, 0.1);             /* 外部阴影模拟材质 */
+
+/* 叠加一个白色的半透明渐变，模拟雾面材质 */
+background-image: linear-gradient(
+  145deg,
+  rgba(255, 255, 255, 0.05),
+  rgba(255, 255, 255, 0)
+);
+  flex-direction: column;
+  align-items: center;
+}
+.login-form {
+  width: clamp(380px, 28vw, 480px);
+  background: url('./static/bitcoin.jpg') no-repeat center center / cover;
+  position: relative;
+  z-index: 1;
+  /* background: rgba(255, 255, 255, 0.1); 
+  backdrop-filter: blur(2rem);          
+  -webkit-backdrop-filter: blur(10px);   */
+   border-radius: 18px;
+  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.7), 0 0 0 2px #bfa14a;
+  min-width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+}
+.login-title {
+  color: #bfa14a;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px #000;
+}
+.login-form input {
+  width: 100%;
+  margin-bottom: 1.2rem;
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #232323;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0 0 0 1.5px #bfa14a inset;
+  transition: box-shadow 0.2s;
+}
+.login-form input:focus {
+  box-shadow: 0 0 0 2.5px #ffd700 inset;
+}
+.login-form button {
+  width: 100%;
+  padding: 0.9rem 0;
+  background: linear-gradient(90deg, #bfa14a 60%, #ffd700 100%);
+  color: #18181a;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #000;
+  transition: background 0.2s, color 0.2s;
+}
+.login-form button:hover {
+  background: linear-gradient(90deg, #ffd700 60%, #bfa14a 100%);
+  color: #000;
+}
+.login-actions {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+.action-btn {
+  width: 20%;
+  background: none;
+  border: none;
+  color: #ffd700;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.2rem 0.7rem;
+  border-radius: 6px;
+  transition: color 0.2s, text-decoration 0.2s;
+  outline: none;
+}
+.action-btn:hover, .action-btn:focus {
+  color: #fff;
+  text-decoration: underline;
+}
+.input-error {
+  box-shadow: 0 0 0 2.5px #ff4d4f inset !important;
+  border: 1.5px solid #ff4d4f !important;
+}
+.input-error-text {
+  color: #ff4d4f;
+  font-size: 0.95rem;
+  margin-bottom: 0.7rem;
+  margin-top: -0.7rem;
+  text-align: left;
+  width: 100%;
+  letter-spacing: 0.5px;
+}
+/* 响应式设计优化 */
+@media (min-width: 1920px) {
+  .login-form {
+    width: clamp(420px, 25vw, 520px);
+  }
+  .login-title {
+    font-size: 2.2rem;
+  }
+  .glass-card {
+    padding: 3rem 2.5rem 2.5rem 2.5rem;
+  }
+}
+
+@media (max-width: 1366px) and (min-width: 1024px) {
+  .login-form {
+    width: clamp(360px, 32vw, 450px);
+  }
+}
+
+@media (max-width: 1023px) and (min-width: 768px) {
+  .login-form {
+    width: clamp(340px, 45vw, 420px);
+  }
+  .login-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 767px) and (min-width: 600px) {
+  .login-form {
+    width: clamp(320px, 60vw, 400px);
+  }
+  .login-title {
+    font-size: 1.6rem;
+  }
+  .glass-card {
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 599px) {
+  .login-form {
+    width: 90vw;
+    min-width: 280px;
+    max-width: 350px;
+  }
+  .login-title {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .glass-card {
+    padding: 1.5rem 1rem 1rem 1rem;
+  }
+  .login-form input {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.95rem;
+  }
+  .login-form button {
+    padding: 0.8rem 0;
+    font-size: 1rem;
+  }
+} 

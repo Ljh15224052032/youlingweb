@@ -57,6 +57,11 @@ function App() {
   const current = sections.find(s => s.key === currentSection);
   const CurrentComponent = current.component;
 
+  // 处理用户名长度，超过15个字符时显示前12个字符加省略号
+  const displayUsername = userInfo.username && userInfo.username.length > 15 
+    ? userInfo.username.substring(0, 12) + '...' 
+    : userInfo.username;
+
   return (
     <div className="layout-bg">
       <aside className="sidebar">
@@ -78,7 +83,7 @@ function App() {
           onClick={() => setCurrentSection('profile')}
         >
           <span className="user-avatar">{icons.user}</span>
-          <span className="user-name">{userInfo.username}</span>
+          <span className="user-name">{displayUsername}</span>
         </div>
       </aside>
       <main className="main-area">

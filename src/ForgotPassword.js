@@ -65,8 +65,9 @@ function ForgotPassword({ onBack }) {
   };
 
   return (
-      <form className="login-form" onSubmit={verify ? handleSubmit : e => e.preventDefault()}>
-        <div className="glass-card">
+      <div className="login-form">
+        <div className="ghost-logo">GHOST</div>
+        <form className="glass-card" onSubmit={verify ? handleSubmit : e => e.preventDefault()}>
           <h2 className="login-title">重置密码</h2>
           <input
             type="text"
@@ -79,26 +80,55 @@ function ForgotPassword({ onBack }) {
           />
           {emailError && <div className="input-error-text">{emailError}</div>}
           {!sent && (
-            <button type="button" className="action-btn" style={{width:'100%',marginBottom:'1rem'}} onClick={handleSendCode}>发送验证码</button>
+            <button type="button" style={{
+              width:'100%',
+              marginBottom:'1rem',
+              padding: '0.9rem 0',
+              background: 'linear-gradient(90deg, #bfa14a 60%, #ffd700 100%)',
+              color: '#18181a',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '700',
+              cursor: 'pointer'
+            }} onClick={handleSendCode}>发送验证码</button>
           )}
           {sent && !verify && (
             <>
               <input type="text" placeholder="输入验证码" value={code} onChange={e => setCode(e.target.value)} />
-              <button type="button" className="action-btn" style={{width:'100%',marginBottom:'1rem'}} onClick={handleVerifyCode}>验证验证码</button>
+              <button type="button" style={{
+                width:'100%',
+                marginBottom:'1rem',
+                padding: '0.9rem 0',
+                background: 'linear-gradient(90deg, #bfa14a 60%, #ffd700 100%)',
+                color: '#18181a',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }} onClick={handleVerifyCode}>验证验证码</button>
             </>
           )}
           {verify && (
             <>
               <input type="password" placeholder="新密码" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
               <input type="password" placeholder="确认新密码" value={confirm} onChange={e => setConfirm(e.target.value)} />
-              <button type="submit">提交</button>
+              <button type="submit" style={{
+                width:'100%',
+                padding: '0.9rem 0',
+                background: 'linear-gradient(90deg, #bfa14a 60%, #ffd700 100%)',
+                color: '#18181a',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}>提交</button>
             </>
           )}
           <div className="login-actions" style={{width:'20%',display:'flex',justifyContent:'left',alignItems:'center'}}>
             <button type="button" className="action-btn" onClick={onBack} style={{width:'100%',background:'none',boxShadow:'none'}}>返回登录</button>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
   );
 }
 

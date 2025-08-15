@@ -76,8 +76,9 @@ function Login({ onLogin, onSwitch }) {
   };
 
   return (
-    <form className="login-form" onSubmit={handleSubmit}>
-      <div className="glass-card">
+    <div className="login-form">
+      <div className="ghost-logo">GHOST</div>
+      <form className="glass-card" onSubmit={handleSubmit}>
         <h2 className="login-title">游领资本</h2>
         <input
           type="text"
@@ -99,8 +100,8 @@ function Login({ onLogin, onSwitch }) {
           <button type="button" className="action-btn" style={{width:'20%', background:'none',boxShadow:'none'}} onClick={() => onSwitch('register')}>注册</button>
           <button type="button" className="action-btn" style={{width:'20%', background:'none',boxShadow:'none'}} onClick={() => onSwitch('forgot')}>忘记密码</button>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
 

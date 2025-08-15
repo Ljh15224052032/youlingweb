@@ -117,8 +117,9 @@ function Register({ onBack }) {
   };
 
   return (
-      <form className="login-form" onSubmit={handleSubmit}>
-        <div className="glass-card">
+      <div className="login-form">
+        <div className="ghost-logo">GHOST</div>
+        <form className="glass-card" onSubmit={handleSubmit}>
           <h2 className="login-title">注册账号</h2>
           <input type="text" placeholder="邮箱" value={email} onChange={e => setEmail(e.target.value)} onBlur={handleEmailBlur} className={emailError ? 'input-error' : ''} />
           {emailError && <div className="input-error-text">{emailError}</div>}
@@ -129,8 +130,8 @@ function Register({ onBack }) {
           <div className="login-actions" style={{width:'20%',display:'flex',justifyContent:'left',alignItems:'center'}}>
             <button type="button" className="action-btn" onClick={onBack} style={{width:'100%',background:'none',boxShadow:'none'}}>返回登录</button>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
   );
 }
 

@@ -14,10 +14,12 @@
     "lightweight-charts": "^4.2.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
     "react-scripts": "5.0.1",
+    "rehype-raw": "^7.0.0",
     "simplebar": "^6.3.2",
     "simplebar-react": "^3.3.2",
-    "sweetalert2": "^11.22.3",
+    "sweetalert2": "^11.22.4",
     "web-vitals": "^2.1.4",
     "zustand": "^5.0.6"
   },

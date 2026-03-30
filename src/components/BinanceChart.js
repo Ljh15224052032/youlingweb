@@ -3,6 +3,8 @@ import { createChart, CrosshairMode, LineStyle } from 'lightweight-charts';
 import { getKlineData, getHistoricalKlineData, timeframeMap, timeToEastEight } from '../services/binanceApi';
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
+import { supabase } from '../services/supabaseClient';
+import useUserStore from '../store/userStore';
 
 const BinanceChart = ({ symbol = 'BTC/USDT', timeframe = '1H' }) => {
   const chartContainerRef = useRef();
@@ -20,6 +22,13 @@ const BinanceChart = ({ symbol = 'BTC/USDT', timeframe = '1H' }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [verificationLoading, setVerificationLoading] = useState(true);
+  const [userType, setUserType] = useState('');
+  const [userTypeLoading, setUserTypeLoading] = useState(true);
+  
+  // 从userStore获取用户信息
+  const { userInfo } = useUserStore();
   
   // 保存已加载的数据
   const currentDataRef = useRef({
@@ -27,6 +36,65 @@ const BinanceChart = ({ symbol = 'BTC/USDT', timeframe = '1H' }) => {
     volumeData: [],
     rsiData: []
   });
+
+  // 检查用户认证状态和用户类型
+  const checkUserStatus = async () => {
+    if (!userInfo.id) {
+      setVerificationLoading(false);
+      setUserTypeLoading(false);
+      return;
+    }
+    
+    try {
+      setVerificationLoading(true);
+      setUserTypeLoading(true);
+      
+      const { data, error } = await supabase
+        .from('users')
+        .select('is_verified, user_type')
+        .eq('id', userInfo.id)
+        .single();
+      
+      if (error) throw error;
+      
+      const verified = data.is_verified;
+      const type = data.user_type || '普通用户';
+      
+      console.log('【看盘工具】用户状态:', {
+        id: userInfo.id,
+        verified: verified,
+        type: type,
+        time: new Date().toLocaleTimeString()
+      });
+      
+      setIsVerified(verified);
+      setUserType(type);
+    } catch (error) {
+      console.error('检查用户状态失败:', error);
+      setIsVerified(false);
+      setUserType('普通用户');
+    } finally {
+      setVerificationLoading(false);
+      setUserTypeLoading(false);
+    }
+  };
+  
+  // 每次组件渲染时检查用户状态
+  useEffect(() => {
+    checkUserStatus();
+    
+    // 添加组件挂载时的日志
+    console.log('【看盘工具】组件挂载/更新:', {
+      mounted: true,
+      time: new Date().toLocaleTimeString()
+    });
+    
+    return () => {
+      console.log('【看盘工具】组件卸载:', {
+        time: new Date().toLocaleTimeString()
+      });
+    };
+  }, [userInfo.id]);
 
   // 计算RSI指标
   const calculateRSI = (prices, period = 14) => {
@@ -569,39 +637,58 @@ const BinanceChart = ({ symbol = 'BTC/USDT', timeframe = '1H' }) => {
 
   return (
     <SimpleBar style={{height:'calc(100vh - 200px)'}} className="binance-chart-container">
-      {loading && (
+      {verificationLoading || userTypeLoading ? (
         <div className="loading-overlay">
-          <div className="loading-spinner">加载历史数据中...</div>
+          <div className="loading-spinner">验证用户状态中...</div>
         </div>
-      )}
-      {loadingMore && (
-        <div className="loading-more-indicator">
-          <div className="loading-more-text">加载更多历史数据中...</div>
+      ) : !isVerified ? (
+        <div className="verification-required">
+          <h2>需要账号验证</h2>
+          <p>请先完成账号验证（绑定UID）后再访问此页面</p>
         </div>
-      )}
-      {error && (
-        <div className="error-message">
-          {error}
+      ) : userType !== '高级用户' && userType !== '合作机构' && userType !== 'premium' ? (
+        <div className="verification-required">
+          <h2>需要高级用户权限</h2>
+          <p>此功能仅对高级用户开放，请升级您的账户等级</p>
+          <p className="debug-info">当前用户类型: {userType}</p>
         </div>
+      ) : (
+        <>
+          {loading && (
+            <div className="loading-overlay">
+              <div className="loading-spinner">加载历史数据中...</div>
+            </div>
+          )}
+          {loadingMore && (
+            <div className="loading-more-indicator">
+              <div className="loading-more-text">加载更多历史数据中...</div>
+            </div>
+          )}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+          
+          {/* K线图表 */}
+          <div className="chart-section">
+            <h4 className="chart-title">K线图</h4>
+            <div ref={chartContainerRef} className="chart-container" />
+          </div>
+          
+          {/* 交易量图表 */}
+          <div className="chart-section">
+            <h4 className="chart-title">交易量</h4>
+            <div ref={volumeContainerRef} className="chart-container" />
+          </div>
+          
+          {/* RSI图表 */}
+          <div className="chart-section">
+            <h4 className="chart-title">RSI指标</h4>
+            <div ref={rsiContainerRef} className="chart-container" />
+          </div>
+        </>
       )}
-      
-      {/* K线图表 */}
-      <div className="chart-section">
-        <h4 className="chart-title">K线图</h4>
-        <div ref={chartContainerRef} className="chart-container" />
-      </div>
-      
-      {/* 交易量图表 */}
-      <div className="chart-section">
-        <h4 className="chart-title">交易量</h4>
-        <div ref={volumeContainerRef} className="chart-container" />
-      </div>
-      
-      {/* RSI图表 */}
-      <div className="chart-section">
-        <h4 className="chart-title">RSI指标</h4>
-        <div ref={rsiContainerRef} className="chart-container" />
-      </div>
     </SimpleBar>
   );
 };

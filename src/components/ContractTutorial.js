@@ -1,85 +1,176 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Components.css';
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
+import { supabase } from '../services/supabaseClient';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import useUserStore from '../store/userStore';
 
 function ContractTutorial() {
-  const [tutorials] = useState([
-    {
-      id: 1,
-      title: 'Solidity 基础语法',
-      level: '入门',
-      description: '学习 Solidity 编程语言的基本语法和数据类型，包括变量声明、数据类型、函数定义等核心概念。',
-      content: `
-        Solidity 是以太坊智能合约开发的主要编程语言。本教程将带您了解：
-        
-        • 基本语法结构
-        • 数据类型（uint, string, bool, address等）
-        • 函数的定义和调用
-        • 修饰器的使用
-        • 事件和日志记录
-        
-        通过学习这些基础知识，您将为后续的智能合约开发打下坚实的基础。
-      `,
-      duration: '2小时'
-    },
-    {
-      id: 2,
-      title: '智能合约开发实战',
-      level: '中级',
-      description: '通过实际项目学习智能合约的开发和部署，掌握完整的开发流程。',
-      content: `
-        本课程通过实际项目带您体验完整的智能合约开发流程：
-        
-        • 项目需求分析和架构设计
-        • 合约代码编写和优化
-        • 本地测试环境搭建
-        • 合约部署和验证
-        • 前端交互集成
-        
-        您将开发一个完整的代币合约，包括转账、授权、铸造等功能。
-      `,
-      duration: '4小时'
-    },
-    {
-      id: 3,
-      title: 'DeFi 协议开发',
-      level: '高级',
-      description: '学习去中心化金融协议的设计和实现，掌握 DeFi 核心机制。',
-      content: `
-        深入学习 DeFi 协议的核心概念和实现：
-        
-        • 自动化做市商（AMM）原理
-        • 流动性挖矿机制设计
-        • 借贷协议架构
-        • 治理代币经济学
-        • 跨链桥接技术
-        
-        通过实践项目，您将构建一个简化版的 DEX 交易所。
-      `,
-      duration: '6小时'
-    },
-    {
-      id: 4,
-      title: '合约安全审计',
-      level: '专家',
-      description: '掌握智能合约安全审计的方法和技巧，识别和防范常见安全漏洞。',
-      content: `
-        智能合约安全是区块链开发的重中之重：
-        
-        • 常见安全漏洞分析（重入攻击、整数溢出等）
-        • 静态分析工具使用
-        • 动态测试方法
-        • 形式化验证技术
-        • 安全审计报告编写
-        
-        学习如何使用专业工具进行安全审计，保障合约资金安全。
-      `,
-      duration: '3小时'
-    },
-   
+  const [tutorials, setTutorials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isVerified, setIsVerified] = useState(false);
+  const [verificationLoading, setVerificationLoading] = useState(true);
+  const [userType, setUserType] = useState('');
+  const [userTypeLoading, setUserTypeLoading] = useState(true);
+  
+  // 从userStore获取用户信息
+  const { userInfo } = useUserStore();
+  
+  // 检查用户认证状态和用户类型
+  const checkUserStatus = async () => {
+    if (!userInfo.id) {
+      setVerificationLoading(false);
+      setUserTypeLoading(false);
+      return;
+    }
     
-  ]);
+    try {
+      setVerificationLoading(true);
+      setUserTypeLoading(true);
+      
+      const { data, error } = await supabase
+        .from('users')
+        .select('is_verified, user_type')
+        .eq('id', userInfo.id)
+        .single();
+      
+      if (error) throw error;
+      
+      const verified = data.is_verified;
+      const type = data.user_type || '普通用户';
+      
+      console.log('【合约教学】用户状态:', {
+        id: userInfo.id,
+        verified: verified,
+        type: type,
+        time: new Date().toLocaleTimeString()
+      });
+      
+      setIsVerified(verified);
+      setUserType(type);
+    } catch (error) {
+      console.error('检查用户状态失败:', error);
+      setIsVerified(false);
+      setUserType('普通用户');
+    } finally {
+      setVerificationLoading(false);
+      setUserTypeLoading(false);
+    }
+  };
+  
+  // 每次组件渲染时检查用户状态
+  useEffect(() => {
+    checkUserStatus();
+    
+    // 添加组件挂载时的日志
+    console.log('【合约教学】组件挂载/更新:', {
+      mounted: true,
+      time: new Date().toLocaleTimeString()
+    });
+    
+    return () => {
+      console.log('【合约教学】组件卸载:', {
+        time: new Date().toLocaleTimeString()
+      });
+    };
+  }, [userInfo.id]);
+
+  // 从Supabase获取合约教学数据
+  useEffect(() => {
+    const fetchTutorials = async () => {
+      try {
+        setLoading(true);
+        
+        // 获取合约教学数据
+        const { data, error } = await supabase
+          .from('contract_tutorials')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        // 处理获取到的数据
+        const processedTutorials = data.map(tutorial => {
+          // 解析标签数据 - 根据提供的SQL格式: "{\"入门\"]}"
+          let tags = [];
+          try {
+            if (tutorial.tags) {
+              let tagsString = tutorial.tags;
+              
+              // 尝试匹配格式中的标签
+              const tagMatch = tagsString.match(/"([^"]+)"/);
+              if (tagMatch && tagMatch[1]) {
+                tags = [tagMatch[1]];
+              } else if (typeof tagsString === 'string') {
+                // 尝试常规JSON解析
+                try {
+                  const parsedTags = JSON.parse(tagsString);
+                  if (Array.isArray(parsedTags)) {
+                    tags = parsedTags;
+                  } else if (typeof parsedTags === 'object') {
+                    tags = Object.values(parsedTags);
+                  } else {
+                    tags = [String(parsedTags)];
+                  }
+                } catch (jsonError) {
+                  // JSON解析失败，使用正则提取引号内内容
+                  const matches = tagsString.match(/"([^"]+)"/g);
+                  if (matches) {
+                    tags = matches.map(m => m.replace(/"/g, ''));
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.error('解析标签失败:', e, tutorial.tags);
+          }
+          
+          console.log('解析到的标签:', tags);
+          
+          // 选择第一个标签作为level，如果没有则默认为"基础"
+          const level = tags && tags.length > 0 ? tags[0] : '基础';
+          
+          // 提取内容前50个字符作为描述
+          const description = tutorial.content 
+            ? tutorial.content.replace(/[!#*\[\]\(\)`]/g, '').substring(0, 50) + '...'
+            : '暂无描述';
+          
+          return {
+            id: tutorial.id,
+            title: tutorial.title || '无标题教程',
+            level: level,
+            description: description,
+            content: tutorial.content || '暂无内容',
+            created_at: tutorial.created_at
+          };
+        });
+        
+        setTutorials(processedTutorials);
+        console.log('获取到的合约教学数据:', processedTutorials);
+      } catch (err) {
+        console.error('获取合约教学数据失败:', err);
+        setError(err.message);
+        
+        // 加载失败时使用默认数据
+        setTutorials([
+          {
+            id: 1,
+            title: 'Solidity 基础语法',
+            level: '入门',
+            description: '学习 Solidity 编程语言的基本语法和数据类型...',
+            content: '内容加载失败，请稍后再试。'
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTutorials();
+  }, []);
 
   const [expandedTutorial, setExpandedTutorial] = useState(null);
 
@@ -91,42 +182,88 @@ function ContractTutorial() {
     }
   };
 
+  // 自定义样式 - 特别是用于处理Markdown中的图片显示
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .markdown-content img {
+        max-width: 30%; /* 控制图片大小 */
+        height: auto;
+        display: block;
+        margin: 15px auto;
+        border-radius: 6px;
+        border: 1px solid #333;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <SimpleBar className="component-container tutorial-scroll">
-      <div className="tutorial-container">
-        {tutorials.map(tutorial => (
-          <div key={tutorial.id} className="guide-item-wrapper">
-            <div 
-              className={`guide-item ${expandedTutorial?.id === tutorial.id ? 'active' : ''}`}
-              onClick={() => handleTutorialClick(tutorial)}
-            >
-              <div className="guide-header">
-                <h3>{tutorial.title}</h3>
-                <span className={`level-badge ${tutorial.level}`}>{tutorial.level}</span>
-              </div>
-            </div>
-            
-            {expandedTutorial?.id === tutorial.id && (
-              <div className="guide-detail-expanded">
-                <div className="tutorial-info">
-                  <span className="level">等级：{tutorial.level}</span>
-                  <span className="duration">时长：{tutorial.duration}</span>
+      {verificationLoading || userTypeLoading ? (
+        <div className="loading-container">
+          <p>验证用户状态中...</p>
+        </div>
+      ) : !isVerified ? (
+        <div className="verification-required">
+          <h2>需要账号验证</h2>
+          <p>请先完成账号验证（绑定UID）后后再访问此页面</p>
+        </div>
+      ) : userType !== '高级用户' && userType !== '合作机构' && userType !== 'premium' ? (
+        <div className="verification-required">
+          <h2>需要高级用户权限</h2>
+          <p>此功能仅对高级用户开放，请升级您的账户等级</p>
+          <p className="debug-info">当前用户类型: {userType}</p>
+        </div>
+      ) : loading ? (
+        <div className="loading-container">
+          <p>正在加载教程内容...</p>
+        </div>
+      ) : error ? (
+        <div className="error-container">
+          <p>加载失败: {error}</p>
+        </div>
+      ) : (
+        <div className="tutorial-container">
+          {tutorials.map(tutorial => (
+            <div key={tutorial.id} className="guide-item-wrapper">
+              <div 
+                className={`guide-item ${expandedTutorial?.id === tutorial.id ? 'active' : ''}`}
+                onClick={() => handleTutorialClick(tutorial)}
+              >
+                <div className="guide-header">
+                  <h3>{tutorial.title}</h3>
+                  <span className={`level-badge ${tutorial.level}`}>{tutorial.level}</span>
                 </div>
-                
-                <div className="guide-content">
-                  <div className="tutorial-description">
-                    <p>{tutorial.description}</p>
+              </div>
+              
+              {expandedTutorial?.id === tutorial.id && (
+                <div className="guide-detail-expanded">
+                  <div className="tutorial-info">
+                    <span className="level">等级：{tutorial.level}</span>
                   </div>
                   
-                  <div className="tutorial-detailed-content">
-                    <pre>{tutorial.content}</pre>
+                  <div className="guide-content">
+                    
+                    
+                    <div className="tutorial-detailed-content markdown-content">
+                      {/* 使用ReactMarkdown渲染Markdown内容 */}
+                      <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                        {tutorial.content}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </SimpleBar>
   );
 }

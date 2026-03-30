@@ -8,10 +8,12 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "animate.css": "^4.1.1",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "lightweight-charts": "^4.2.3",
+    "marked": "^16.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",
@@ -24,8 +26,8 @@
     "zustand": "^5.0.6"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "node --max-old-space-size=4096 node_modules/react-scripts/scripts/start.js",
+    "build": "node --max-old-space-size=4096 node_modules/react-scripts/scripts/build.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

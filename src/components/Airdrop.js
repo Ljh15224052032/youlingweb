@@ -6,103 +6,97 @@ import { supabase } from '../services/supabaseClient';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import Swal from 'sweetalert2';
+import useUserStore from '../store/userStore';
+import { marked } from 'marked';
 
-function Airdrop() {
+function Airdrop({ setCurrentSection }) {
   const [airdrops, setAirdrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAirdrop, setSelectedAirdrop] = useState(null);
-  const [user, setUser] = useState(null);
-  const [isUserVerified, setIsUserVerified] = useState(false);
   const [submissionLoading, setSubmissionLoading] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [verificationLoading, setVerificationLoading] = useState(true);
+  const [userType, setUserType] = useState('');
+  const [userTypeLoading, setUserTypeLoading] = useState(true);
+  
+  // 从userStore获取用户信息
+  const { userInfo } = useUserStore();
+  // 判断用户是否登录（通过检查用户ID是否存在）
+  const isLoggedIn = !!userInfo.id;
+  const user = isLoggedIn ? { id: userInfo.id } : null;
 
-  // 从Supabase获取空投活动数据
-  // 获取当前用户信息及验证状态
+  // 检查用户认证状态和用户类型
   useEffect(() => {
-    const getUserData = async () => {
-      try {
-        // 获取当前会话用户
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session?.user) {
-          setUser(session.user);
-          
-          // 获取用户验证状态
-          const { data, error } = await supabase
-            .from('users')
-            .select('is_verified')
-            .eq('id', session.user.id)
-            .single();
-          
-          if (!error && data) {
-            setIsUserVerified(data.is_verified);
-          }
-        }
-      } catch (error) {
-        console.error('获取用户信息失败:', error);
+    const checkUserStatus = async () => {
+      if (!userInfo.id) {
+        setVerificationLoading(false);
+        setUserTypeLoading(false);
+        return;
       }
-    };
-    
-    getUserData();
-    
-    // 监听用户认证状态变化
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        
-        // 获取用户验证状态
-        const { data } = await supabase
-          .from('users')
-          .select('is_verified')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (data) {
-          setIsUserVerified(data.is_verified);
-        }
-      } else {
-        setUser(null);
-        setIsUserVerified(false);
-      }
-    });
-    
-    return () => {
-      if (authListener && authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchAirdrops = async () => {
+      
       try {
         const { data, error } = await supabase
-          .from('airdrops')
-          .select('*');
+          .from('users')
+          .select('is_verified, user_type')
+          .eq('id', userInfo.id)
+          .single();
         
         if (error) throw error;
         
-        // 将后端数据映射到前端使用的格式
-        const formattedAirdrops = data.map(airdrop => ({
+        setIsVerified(data.is_verified);
+        setUserType(data.user_type || '普通用户');
+      } catch (error) {
+        console.error('检查用户状态失败:', error);
+        setIsVerified(false);
+        setUserType('普通用户');
+      } finally {
+        setVerificationLoading(false);
+        setUserTypeLoading(false);
+      }
+    };
+    
+    checkUserStatus();
+  }, [userInfo.id]);
+
+  // 从Supabase获取空投活动数据
+  useEffect(() => {
+    const fetchAirdrops = async () => {
+      try {
+          const { data, error } = await supabase
+            .from('airdrops')
+            .select('*');
+        
+          if (error) throw error;
+        
+          // 将后端数据映射到前端使用的格式
+          const formattedAirdrops = data.map(airdrop => ({
           id: airdrop.id,
           name: airdrop.name,
-          description: '点击查看活动详情', // 不再显示content作为描述
-          reward: airdrop.reward ? `${airdrop.reward}积分` : '暂无奖励',
-          deadline: airdrop.end_time,
-          status: airdrop.status, // 直接使用后端的status
-          startDate: airdrop.start_time,
-          content: airdrop.content // 保存完整的活动内容
-        }));
-        
-        setAirdrops(formattedAirdrops);
+            description: '点击查看活动详情', // 不再显示content作为描述
+            reward: airdrop.reward ? `${airdrop.reward}积分` : '暂无奖励',
+            deadline: airdrop.end_time,
+            status: airdrop.status, // 直接使用后端的status
+            startDate: airdrop.start_time,
+            content: airdrop.content // 保存完整的活动内容
+          }));
+          
+          setAirdrops(formattedAirdrops);
       } catch (error) {
-        console.error('获取空投活动失败:', error);
+          console.error('获取空投活动失败:', error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchAirdrops();
   }, []);
+
+  // 确保在选中活动后保持引用
+  useEffect(() => {
+    if (selectedAirdrop) {
+      console.log('活动已选中，ID:', selectedAirdrop.id);
+    }
+  }, [selectedAirdrop]);
 
   // 按状态优先级排序：即将开始 > 进行中 > 已结束
   const sortedAirdrops = [...airdrops].sort((a, b) => {
@@ -111,57 +105,149 @@ function Airdrop() {
   });
 
   const handleParticipate = (airdrop) => {
-    setSelectedAirdrop(airdrop);
-  };
-
-  const closeTutorial = () => {
-    setSelectedAirdrop(null);
+    // 先设置选中的活动，确保在整个流程中活动ID都可用
+    // 创建一个新对象，避免引用问题
+    const airdropData = {...airdrop};
+    setSelectedAirdrop(airdropData);
+    console.log('选中活动:', airdropData.id, airdropData);
+    
+    // 改为使用弹窗显示活动详情
+    Swal.fire({
+      title: `${airdrop.name} - 活动详情`,
+      width: '70%',
+      html: `
+        <div class="airdrop-popup-content">
+          <div class="activity-content markdown-content">
+            ${airdrop.content ? 
+              `<div id="markdown-content-container"></div>` :
+              `<div class="no-content-message">暂无详细活动内容</div>`
+            }
+          </div>
+          
+          <div class="info-box" style="margin-top: 20px; padding: 15px; border: 1px solid #333; border-radius: 8px; background-color: #1a1a1a;">
+            <h4 style="color: #ffd700; margin-bottom: 10px;">⚠️ 活动信息</h4>
+            <p style="margin: 5px 0;">• 奖励: ${airdrop.reward}</p>
+            <p style="margin: 5px 0;">• 开始时间: ${airdrop.startDate}</p>
+            <p style="margin: 5px 0;">• 结束时间: ${airdrop.deadline}</p>
+            <p style="margin: 5px 0;">• 状态: ${getStatusText(airdrop.status)}</p>
+          </div>
+        </div>
+      `,
+      showCloseButton: true,
+      showCancelButton: airdrop.status === 'ongoing',
+      cancelButtonText: '关闭',
+      confirmButtonText: airdrop.status === 'ongoing' ? '立即参与' : '关闭',
+      didOpen: () => {
+        // 如果有内容，渲染Markdown内容
+        if (airdrop.content) {
+          const container = document.getElementById('markdown-content-container');
+          
+          // 使用marked库将Markdown转换为HTML
+          try {
+            // 配置marked选项，支持GFM和表格等
+            marked.setOptions({
+              breaks: true,        // 支持GitHub风格的换行
+              gfm: true,           // 支持GitHub风格的Markdown
+              headerIds: true,     // 为标题生成ID
+              mangle: false,       // 不转义HTML
+              sanitize: false      // 不进行HTML清理（允许HTML标签）
+            });
+            
+            // 将Markdown转换为HTML并插入容器
+            container.innerHTML = marked.parse(airdrop.content);
+            
+            // 添加样式到容器内的图片 - 缩小并居中
+            const images = container.querySelectorAll('img');
+            images.forEach(img => {
+              img.style.maxWidth = '30%'; // 进一步缩小图片到50%
+              img.style.height = 'auto';
+              img.style.marginBottom = '15px';
+              img.style.marginTop = '10px';
+              img.style.borderRadius = '6px';
+              // 居中显示图片
+              img.style.display = 'block';
+              img.style.marginLeft = 'auto';
+              img.style.marginRight = 'auto';
+              // 添加边框和阴影效果
+              img.style.border = '1px solid #333';
+              img.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+            });
+          } catch (error) {
+            console.error('渲染Markdown内容失败', error);
+            container.textContent = airdrop.content;
+          }
+        }
+      },
+      backdrop: true,
+      customClass: {
+        container: 'airdrop-popup-container',
+        popup: 'airdrop-popup',
+        content: 'airdrop-popup-inner'
+      },
+    }).then((result) => {
+      // 如果点击"立即参与"按钮
+      if (result.isConfirmed && airdrop.status === 'ongoing') {
+        // 在点击参与按钮时再次确认选中的活动
+        // 创建一个新的对象副本避免引用丢失
+        const airdropCopy = {...airdrop};
+        setSelectedAirdrop(airdropCopy);
+        console.log('准备参与活动，已设置活动ID:', airdropCopy.id, airdropCopy);
+        
+        // 直接传递活动数据，避免状态更新延迟问题
+        handleJoinActivity(airdropCopy);
+      }
+    });
   };
   
   // 处理用户参与活动
-  const handleJoinActivity = async () => {
-    // 再次获取最新的会话状态
-    const { data: { session } } = await supabase.auth.getSession();
-    console.log('当前会话状态:', session);
-    console.log('当前用户状态:', user);
-    
-    // 优先使用最新获取的会话用户
-    const currentUser = session?.user || user;
-    
-    if (!currentUser) {
+  const handleJoinActivity = async (airdropData = null) => {
+    // 检查用户ID是否存在
+    if (!userInfo.id) {
       Swal.fire({
         title: '需要登录',
         text: '请先登录后再参与活动',
         icon: 'warning',
-        confirmButtonText: '确定'
+        confirmButtonText: '确定',
+        background: '#1e222d',
+        color: '#d1d4dc',
       });
       return;
     }
     
-    // 更新本地用户状态（以防之前没有正确设置）
-    if (session?.user && !user) {
-      setUser(session.user);
-    }
-    
-    if (!isUserVerified) {
+    // 只检查用户是否已验证
+    if (!isVerified) {
       Swal.fire({
-        title: '未通过验证',
-        text: '请先完成交易所UID认证后再参与活动',
+        title: '需要验证',
+        text: '请先完成账号验证后再参与活动',
         icon: 'warning',
-        confirmButtonText: '前往验证',
-        showCancelButton: true,
-        cancelButtonText: '取消'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // 跳转至验证页面的逻辑，可以根据实际路由修改
-          window.location.href = '/verification';
-        }
+        confirmButtonText: '确定',
+        background: '#1e222d',
+        color: '#d1d4dc',
       });
       return;
     }
+    
+    // 优先使用传入的活动数据，如果没有则使用状态中的活动
+    const currentAirdrop = airdropData || selectedAirdrop;
+    
+    // 检查是否有选中的活动
+    if (!currentAirdrop || !currentAirdrop.id) {
+      console.error('没有选中的活动或活动ID丢失', { airdropData, selectedAirdrop, currentAirdrop });
+      Swal.fire({
+        title: '操作失败',
+        text: '没有选中的活动，请重新选择活动',
+        icon: 'error',
+        confirmButtonText: '确定',
+        background: '#1e222d',
+        color: '#d1d4dc',
+      });
+      return;
+    }
+    
+    console.log('准备提交活动:', currentAirdrop);
     
     // 用户已验证，显示提交表单
-    const { value: formValues } = await Swal.fire({
+    const { value: formValues } = await     Swal.fire({
       title: '参与活动',
       html:
         '<div class="submission-form">' +
@@ -174,6 +260,10 @@ function Airdrop() {
       showCancelButton: true,
       cancelButtonText: '取消',
       confirmButtonText: '提交',
+      background: '#1e222d',
+      color: '#d1d4dc',
+      confirmButtonColor: '#bfa14a',
+      cancelButtonColor: '#666',
       preConfirm: () => {
         const submissionText = document.getElementById('submission-text').value;
         const submissionFile = document.getElementById('submission-file').files[0];
@@ -195,28 +285,50 @@ function Airdrop() {
       }
     });
     
-    if (formValues) {
-      await submitActivity(formValues.text, formValues.file);
+    if (formValues && currentAirdrop && currentAirdrop.id) {
+      console.log('表单提交中，活动ID:', currentAirdrop.id);
+      await submitActivity(formValues.text, formValues.file, currentAirdrop);
+    } else {
+      console.error('提交失败：表单值或活动数据缺失', { formValues, currentAirdrop });
     }
   };
   
   // 提交活动参与信息到Supabase
-  const submitActivity = async (text, file) => {
-    // 再次获取最新的会话状态，确保有用户信息
-    const { data: { session } } = await supabase.auth.getSession();
-    const currentUser = session?.user || user;
+  const submitActivity = async (text, file, airdropData) => {
+    // 使用传入的活动数据，不再依赖state
+    const activityData = airdropData || selectedAirdrop;
     
-    if (!selectedAirdrop || !currentUser) {
-      console.error('提交失败: 没有活动或用户信息');
+    // 打印调试信息以检查状态
+    console.log('提交活动信息 - 选中的活动:', activityData);
+    console.log('提交活动信息 - 用户ID:', userInfo.id);
+    
+    if (!activityData || !activityData.id || !userInfo.id) {
+      console.error('提交失败: 没有活动或用户未登录');
+      Swal.fire({
+        icon: 'error',
+        title: '提交失败',
+        text: '没有选中活动或用户未登录，请重新尝试',
+        background: '#1e222d',
+        color: '#d1d4dc',
+        confirmButtonColor: '#ef5350',
+        confirmButtonText: '确定'
+      });
       return;
     }
     
     try {
+      // 从userStore获取用户ID (现在数据库user_id是INT8类型)
+      const userId = userInfo.id;
+      if (!userId) {
+        throw new Error('无法获取有效的用户ID');
+      }
+      
+      console.log('提交活动使用的用户ID:', userId);
       setSubmissionLoading(true);
       
       // 1. 上传图片到Supabase Storage
       const fileExt = file.name.split('.').pop();
-      const fileName = `${currentUser.id}_${Date.now()}.${fileExt}`;
+      const fileName = `${userId}_${Date.now()}.${fileExt}`;
       const filePath = `activity_submissions/${fileName}`;
       
       // 上传图片
@@ -236,8 +348,8 @@ function Airdrop() {
         .from('activity_submissions')
         .insert([
           {
-            user_id: currentUser.id,
-            airdrop_id: selectedAirdrop.id,
+            user_id: userId,
+            airdrop_id: activityData.id,
             submission_text: text,
             submission_image: publicUrl,
             status: 'pending',  // 待审核状态
@@ -250,7 +362,7 @@ function Airdrop() {
       // 3. 更新Airdrops表中的participants数量
       const { error: updateError } = await supabase.rpc(
         'increment_participants', 
-        { airdrop_id: selectedAirdrop.id }
+        { airdrop_id: activityData.id }
       );
       
       if (updateError) console.error('更新参与人数失败:', updateError);
@@ -265,9 +377,21 @@ function Airdrop() {
       
     } catch (error) {
       console.error('提交活动参与失败:', error);
+      
+      // 显示更详细的错误信息
+      let errorMessage = '提交过程中发生错误，请稍后重试';
+      
+      if (error.message) {
+        errorMessage += `\n错误详情: ${error.message}`;
+      }
+      
+      if (error.details) {
+        errorMessage += `\n${error.details}`;
+      }
+      
       Swal.fire({
         title: '提交失败',
-        text: '提交过程中发生错误，请稍后重试',
+        text: errorMessage,
         icon: 'error',
         confirmButtonText: '确定'
       });
@@ -294,16 +418,102 @@ function Airdrop() {
     }
   };
 
+  // 添加自定义样式，用于弹窗内容
+  useEffect(() => {
+    // 向文档添加样式，确保弹窗内的Markdown内容正确显示
+    const style = document.createElement('style');
+    style.textContent = `
+      .airdrop-popup {
+        background-color: #1a1a1a !important;
+        color: #eee !important;
+        border-radius: 10px !important;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
+      }
+      
+      .airdrop-popup-content {
+        padding: 10px;
+        max-height: 70vh;
+        overflow-y: auto;
+        text-align: left; /* 确保文本左对齐 */
+      }
+      
+      .airdrop-popup-content h1, 
+      .airdrop-popup-content h2, 
+      .airdrop-popup-content h3 {
+        color: #ffd700;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        text-align: left; /* 标题左对齐 */
+      }
+      
+      .airdrop-popup-content p {
+        text-align: left; /* 段落左对齐 */
+        margin-bottom: 1rem;
+      }
+      
+      .airdrop-popup-content img {
+        max-width: 30% !important; /* 减小图片宽度至50% */
+        height: auto !important;
+        display: block !important;
+        margin: 15px auto !important; /* 上下间距15px，左右自动（居中） */
+        border-radius: 6px !important;
+        border: 1px solid #333 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+      }
+      
+      .airdrop-popup-content code {
+        background-color: #2a2a2e;
+        padding: 0.2em 0.4em;
+        border-radius: 3px;
+      }
+      
+      .airdrop-popup-content blockquote {
+        border-left: 3px solid #ffd700;
+        margin-left: 0;
+        padding-left: 10px;
+        color: #bbb;
+        text-align: left;
+      }
+      
+      .airdrop-popup-content a {
+        color: #00ff88;
+      }
+      
+      .airdrop-popup-content ul,
+      .airdrop-popup-content ol {
+        text-align: left;
+        padding-left: 20px;
+        margin-bottom: 1rem;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // 清理函数
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <div className="component-container">
-      <div className="airdrop-layout">
-        <SimpleBar style={{height: 'calc(100vh - 200px)'}} className="airdrop-list">
-          <h2 className="section-title">空投活动</h2>
-          {loading ? (
-            <div className="loading-container">
-              <p>加载中...</p>
-            </div>
-          ) : (
+      {verificationLoading || userTypeLoading ? (
+        <div className="loading-container">
+          <p>验证用户状态中...</p>
+        </div>
+      ) : !isVerified ? (
+        <div className="verification-required">
+          <h2>需要账号验证</h2>
+          <p>请先完成账号验证（绑定UID）后后再访问此页面</p>
+        </div>
+      ) : (
+        <div className="airdrop-layout">
+          <SimpleBar style={{height: 'calc(100vh - 100px)'}} className="airdrop-list">
+            <h2 className="section-title">空投活动</h2>
+            {loading ? (
+              <div className="loading-container">
+                <p>加载中...</p>
+              </div>
+            ) : (
             <div className="airdrop-grid">
               {sortedAirdrops.map(airdrop => (
                 <div key={airdrop.id} className={`airdrop-card ${airdrop.status}`}>
@@ -316,7 +526,7 @@ function Airdrop() {
                       {getStatusText(airdrop.status)}
                     </span>
                   </div>
-                  
+                    
                   <div className="airdrop-details">
                     <div className="reward">
                       <span className="label">奖励：</span>
@@ -330,67 +540,22 @@ function Airdrop() {
                       <span className="label">开始：</span>
                       <span className="value">{airdrop.startDate}</span>
                     </div>
-                  </div>
-                  {/* 将所有按钮改为显示活动内容，不再区分状态 */}
-                  <button 
-                    className="participate-btn"
-                    onClick={() => handleParticipate(airdrop)}
-                  >
-                    查看活动详情
-                  </button>
+                    </div>
+                    <button 
+                      className="participate-btn"
+                      onClick={() => handleParticipate(airdrop)}
+                    >
+                      查看活动详情
+                    </button>
                 </div>
               ))}
             </div>
-          )}
-        </SimpleBar>
-
-        {selectedAirdrop && (
-          <div className="tutorial-panel">
-            <div className="tutorial-header">
-              <h3>{selectedAirdrop.name} - 活动详情</h3>
-              <button className="close-btn" onClick={closeTutorial}>×</button>
-            </div>
-            <SimpleBar style={{height: 'calc(100vh - 200px)'}} className="tutorial-content tutorial-scroll">
-              {selectedAirdrop.content ? (
-                <div className="activity-content markdown-content">
-                  {/* 使用 ReactMarkdown 渲染 Markdown 内容 */}
-                  <ReactMarkdown 
-                    rehypePlugins={[rehypeRaw]} // 允许Markdown中包含HTML
-                  >
-                    {selectedAirdrop.content}
-                  </ReactMarkdown>
-                </div>
-              ) : (
-                <div className="no-content-message">
-                  <p>暂无详细活动内容</p>
-                </div>
-              )}
-              
-              <div className="tutorial-section">
-                <h4 className="tutorial-subtitle">⚠️ 活动信息</h4>
-                <div className="info-box">
-                  <p>• 奖励: {selectedAirdrop.reward}</p>
-                  <p>• 开始时间: {selectedAirdrop.startDate}</p>
-                  <p>• 结束时间: {selectedAirdrop.deadline}</p>
-                  <p>• 状态: {getStatusText(selectedAirdrop.status)}</p>
-                </div>
-              </div>
-
-              {selectedAirdrop.status === 'ongoing' && (
-                <button 
-                  className="start-task-btn"
-                  onClick={handleJoinActivity}
-                  disabled={submissionLoading}
-                >
-                  {submissionLoading ? '提交中...' : '立即参与'}
-                </button>
-              )}
-            </SimpleBar>
-          </div>
-        )}
-      </div>
+            )}
+          </SimpleBar>
+        </div>
+      )}
     </div>
   );
 }
 
-export default Airdrop;
+export default Airdrop; 

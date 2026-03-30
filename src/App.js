@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthContainer from './AuthContainer';
 import Airdrop from './components/Airdrop';
 import NewbieGuide from './components/NewbieGuide';
@@ -49,6 +49,48 @@ function App() {
   const [currentSection, setCurrentSection] = useState(sections[0].key);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { isLoggedIn, userInfo, logout } = useUserStore();
+  
+  // 在页面加载时打印当前用户信息
+  useEffect(() => {
+    if (isLoggedIn) {
+      console.log('=== 当前登录用户信息 ===');
+      console.log('用户名:', userInfo.username);
+      console.log('邮箱:', userInfo.email);
+      console.log('等级:', userInfo.level);
+      console.log('积分:', userInfo.points);
+      console.log('注册日期:', userInfo.joinDate);
+      console.log('邀请码:', userInfo.myInviteCode);
+      console.log('父邀请码:', userInfo.parentInviteCode);
+      console.log('币安UID:', userInfo.binanceUID);
+      console.log('BitgetUID:', userInfo.bitgetUID);
+      console.log('是否已验证:', userInfo.is_verified);
+      console.log('用户类型:', userInfo.user_type);
+      console.log('完整用户对象:', userInfo);
+      
+      // 检查是否缺少关键字段，如果缺少，强制更新用户信息
+      if (userInfo.is_verified === undefined || userInfo.user_type === undefined) {
+        console.log('检测到用户数据缺少关键字段，正在尝试修复...');
+        
+        // 强制刷新用户信息 - 方法1：如果有fetchUserByUsername方法
+        if (userInfo.email) {
+          console.log('尝试重新获取用户信息...');
+          const fetchUser = async () => {
+            try {
+              // 假设您在useUserStore中有一个fetchUserByUsername方法
+              const store = useUserStore.getState();
+              await store.fetchUserByUsername(userInfo.email);
+              console.log('用户信息已更新');
+            } catch (error) {
+              console.error('更新用户信息失败:', error);
+            }
+          };
+          fetchUser();
+        }
+      }
+    } else {
+      console.log('用户未登录');
+    }
+  }, [isLoggedIn, userInfo]);
 
   if (!isLoggedIn) {
     return <AuthContainer />;
@@ -91,10 +133,33 @@ function App() {
           <div className="mainbar-section">
             <span className="mainbar-icon">{icons[current.key]}</span>
             <span className="mainbar-title">{current.label}</span>
+            
+            {/* 临时清除存储按钮 */}
+            <button 
+              style={{
+                marginLeft: '20px',
+                padding: '4px 8px',
+                backgroundColor: '#333',
+                color: '#fff',
+                border: '1px solid #555',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }} 
+              onClick={() => {
+                // 清除本地存储
+                localStorage.removeItem('user-storage');
+                console.log('已清除本地存储，请刷新页面');
+                // 可选：重新加载页面
+                window.location.reload();
+              }}
+            >
+              清除缓存并刷新
+            </button>
           </div>
         </header>
         <section className="mainbar-content">
-          <CurrentComponent />
+          <CurrentComponent setCurrentSection={setCurrentSection} />
         </section>
       </main>
     </div>

@@ -116,6 +116,7 @@ function HomePage() {
         <div className="hp-nav-links">
           <button onClick={() => scrollTo('hero')}>首页</button>
           <button onClick={() => scrollTo('tutorials')}>新手教学</button>
+          <button onClick={() => navigate('/docs')}>文档中心</button>
         </div>
         <div className="hp-nav-actions">
           <button className="hp-btn-outline" onClick={() => navigate('/login')}>登录</button>

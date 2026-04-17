@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import AuthContainer from './AuthContainer';
 import HomePage from './pages/HomePage';
+import DocsPage from './pages/DocsPage';
 import Airdrop from './components/Airdrop';
 import NewbieGuide from './components/NewbieGuide';
 import ContractTutorial from './components/ContractTutorial';
@@ -183,6 +184,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/docs" element={<DocsPage />} />
+      <Route path="/docs/:docId" element={<DocsPage />} />
       <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="login" />} />
       <Route path="/register" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="register" />} />
       <Route path="/forgot" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="forgot" />} />

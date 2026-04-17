@@ -115,7 +115,6 @@ function HomePage() {
         <div className="hp-nav-logo">GHOST <LogoIcon size={28} /></div>
         <div className="hp-nav-links">
           <button onClick={() => scrollTo('hero')}>首页</button>
-          <button onClick={() => scrollTo('tutorials')}>新手教学</button>
           <button onClick={() => navigate('/docs')}>文档中心</button>
         </div>
         <div className="hp-nav-actions">

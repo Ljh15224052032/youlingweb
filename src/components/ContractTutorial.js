@@ -57,6 +57,7 @@ function ContractTutorial() {
   // 每次组件渲染时检查用户状态
   useEffect(() => {
     checkUserStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userInfo.id]);
 
   // 从Supabase获取合约教学数据
@@ -114,7 +115,7 @@ function ContractTutorial() {
           
           // 提取内容前50个字符作为描述
           const description = tutorial.content 
-            ? tutorial.content.replace(/[!#*\[\]\(\)`]/g, '').substring(0, 50) + '...'
+            ? tutorial.content.replace(/[!#*[\]()`]/g, '').substring(0, 50) + '...'
             : '暂无描述';
           
           return {

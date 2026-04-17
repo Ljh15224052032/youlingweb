@@ -226,7 +226,7 @@ function NewbieGuide() {
                     </div>
                     {guide.content && (
                       <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', lineHeight: '1.5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {guide.content.replace(/[#*\[\]`>]/g, '').substring(0, 60)}...
+                        {guide.content.replace(/[#*[\]`>]/g, '').substring(0, 60)}...
                       </div>
                     )}
                     <button style={{

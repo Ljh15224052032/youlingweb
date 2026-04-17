@@ -6,7 +6,7 @@ import { supabase } from './services/supabaseClient';
 import Swal from 'sweetalert2';
 function Register() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(''); // eslint-disable-line no-unused-vars
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [inviteCode, setInviteCode] = useState('');

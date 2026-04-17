@@ -8,7 +8,7 @@ import useUserStore from '../store/userStore';
 
 function PointsExchange() {
   const [activeTab, setActiveTab] = useState('shop');
-  const { userInfo, updatePoints, fetchUserByUsername } = useUserStore();
+  const { userInfo, fetchUserByUsername } = useUserStore();
   const userPoints = userInfo.points || 0;
   const [shopItems, setShopItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,6 +78,7 @@ function PointsExchange() {
     if (userInfo.id) {
       fetchUserApplications();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userInfo.id]);
 
   const handleExchange = async (item) => {

@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css';
-import { marked } from 'marked';
+import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import SimpleBar from "simplebar-react";
+import "simplebar-react/dist/simplebar.min.css";
+import { marked } from "marked";
+import Swal from "sweetalert2";
 
 const docs = [
   {
-    id: 'download-binance',
-    title: '如何下载币安 App',
-    category: '交易所教程',
+    id: "download-binance",
+    title: "如何下载币安 App",
+    category: "交易所教程",
     content: `
 # 如何下载币安 App
 
@@ -48,12 +49,13 @@ https://download-1306379396.file.myqcloud.com/pack/Binance.apk
 2. 切换国家为「迪拜/英国」
 3. 搜索「**Binance**」
 4. 下载安装
+![下载币安](/images/download-binance-1.jpg)
 `,
   },
   {
-    id: 'kyc-verification',
-    title: 'KYC 实名认证',
-    category: '交易所教程',
+    id: "kyc-verification",
+    title: "KYC 实名认证",
+    category: "交易所教程",
     content: `
 # 为什么要做 KYC 实名认证？
 
@@ -74,12 +76,14 @@ https://download-1306379396.file.myqcloud.com/pack/Binance.apk
 https://www.binance.com/zh-CN/support/faq/detail/360027287111
 
 > 认证完成后即可解锁 C2C 交易与高额度功能。
+![KYC认证](/images/kyc-verification-1.jpg)
+![KYC认证](/images/kyc-verification-2.jpg)
 `,
   },
   {
-    id: 'c2c-trading',
-    title: 'C2C 交易教程',
-    category: '交易所教程',
+    id: "c2c-trading",
+    title: "C2C 交易教程",
+    category: "交易所教程",
     content: `
 # C2C 交易教程
 
@@ -130,12 +134,13 @@ C2C 交易（又名法币交易）指使用 **人民币** 购买 / 出售数字�
 ## 六、提现前必须等待 24 小时的原因
 
 为防止资金冻结，购买加密资产后需 **等待 24 小时** 才能提现。
+![C2C交易](/images/c2c-trading-1.jpg)
 `,
   },
   {
-    id: 'deposit-withdraw',
-    title: '充值与提现',
-    category: '交易所教程',
+    id: "deposit-withdraw",
+    title: "充值与提现",
+    category: "交易所教程",
     content: `
 # 充值与提现的方式
 
@@ -148,12 +153,14 @@ C2C 交易（又名法币交易）指使用 **人民币** 购买 / 出售数字�
 https://www.binance.com/zh-CN/support/faq/%E5%85%85%E5%80%BC%E4%B8%8E%E6%8F%90%E5%B8%81%E6%96%B0%E6%89%8B%E6%8C%87%E5%BC%951-85a1c394ac1d489fb0bfac0ef2fceafd
 
 > ⚠️ **注意**：大陆用户不支持充值法币，仅支持 C2C 买币充值。
+![充值提现1](/images/deposit-withdraw-1.jpg)
+![充值提现2](/images/deposit-withdraw-2.jpg)
 `,
   },
   {
-    id: 'spot-trading',
-    title: '现货交易实操',
-    category: '交易所教程',
+    id: "spot-trading",
+    title: "现货交易实操",
+    category: "交易所教程",
     content: `
 # 现货交易实操教学
 
@@ -211,56 +218,58 @@ https://www.binance.com/zh-CN/support/faq/%E5%85%85%E5%80%BC%E4%B8%8E%E6%8F%90%E
 **示例：**
 
 当前价格 17U，设置触发价 18U 限价卖出，系统在达到 18U 时才挂单，避免错失波动时机。
-
----
-
-> 📖 更多详细内容请查看：[新手教学指引（Google Docs）](https://docs.google.com/document/d/1rjj-2mnlccLuymckGrW5txIZX8Mpv4f_mbh1IeJ1kZ8/edit?tab=t.6t97vuhhmot8)
+![止盈止损](/images/spot-trading-1.png)
 `,
   },
   {
-    id: 'beginner-guide',
-    title: '新手教学指引',
-    category: '更多资源',
+    id: "beginner-guide",
+    title: "合约交易基础概念",
+    category: "交易所教程",
     content: `
-# 新手教学指引
+# 合约交易基础概念
 
-完整的新手教学指引文档，包含从注册到交易的完整流程说明。
+合约交易的基础概念。
 
-> 📖 **点击查看完整文档**：[新手教学指引（Google Docs）](https://docs.google.com/document/d/1rjj-2mnlccLuymckGrW5txIZX8Mpv4f_mbh1IeJ1kZ8/edit?tab=t.6t97vuhhmot8)
-
----
-
-> ⚠️ 注意：Google Docs 文档在国内可能需要特殊网络才能访问。上方教程均已整理至本站，建议优先阅读站内文档。
+![合约交易1](/images/contract-trading-1.png)
+![合约交易2](/images/contract-trading-2.jpg)
+![合约交易3](/images/contract-trading-3.jpg)
+![合约交易4](/images/contract-trading-4.jpg)
+![合约交易5](/images/contract-trading-5.jpg)
 `,
   },
   {
-    id: 'grid-bot',
-    title: '网格机器人',
-    category: '更多资源',
+    id: "grid-bot",
+    title: "网格机器人",
+    category: "交易所教程",
     content: `
 # 网格机器人
 
-> 📖 **点击查看完整文档**：[网格机器人教程（Google Docs）](https://docs.google.com/document/d/1rjj-2mnlccLuymckGrW5txIZX8Mpv4f_mbh1IeJ1kZ8/edit?tab=t.fo5ug19n7mi6)
-
----
-
-内容正在编写中，敬请期待。
+![网格机器人1](/images/grid-bot-1.jpg)
+![网格机器人2](/images/grid-bot-2.jpg)
+![网格机器人3](/images/grid-bot-3.jpg)
+![网格机器人4](/images/grid-bot-4.jpg)
 `,
   },
 ];
 
-const categories = [...new Set(docs.map(d => d.category))];
+const categories = [...new Set(docs.map((d) => d.category))];
 
-const sidebarGroups = categories.map(cat => ({
+const sidebarGroups = categories.map((cat) => ({
   category: cat,
-  items: docs.filter(d => d.category === cat),
+  items: docs.filter((d) => d.category === cat),
 }));
 
 function DocsContent({ doc }) {
   if (!doc) {
     return (
-      <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'rgba(255,255,255,0.3)' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📖</div>
+      <div
+        style={{
+          textAlign: "center",
+          padding: "4rem 2rem",
+          color: "rgba(255,255,255,0.3)",
+        }}
+      >
+        <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📖</div>
         <p>选择左侧文档开始阅读</p>
       </div>
     );
@@ -268,8 +277,53 @@ function DocsContent({ doc }) {
 
   const html = marked.parse(doc.content, { breaks: true, gfm: true });
 
+  const handleClick = (e) => {
+    if (e.target.tagName !== 'IMG') return;
+
+    const container = e.currentTarget;
+    const images = Array.from(container.querySelectorAll('img'));
+    const index = images.indexOf(e.target);
+    if (index === -1) return;
+
+    const showImage = (i) => {
+      const imgEl = document.getElementById('docs-lightbox-img');
+      const counter = document.getElementById('docs-lightbox-counter');
+      if (imgEl) imgEl.src = images[i].src;
+      if (counter) counter.textContent = images.length > 1 ? `${i + 1} / ${images.length}` : '';
+      document.getElementById('docs-lightbox-prev').style.display = i > 0 ? 'block' : 'none';
+      document.getElementById('docs-lightbox-next').style.display = i < images.length - 1 ? 'block' : 'none';
+      document.getElementById('docs-lightbox-img').dataset.index = i;
+    };
+
+    Swal.fire({
+      html: `
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;height:80vh">
+          <button id="docs-lightbox-prev" style="position:absolute;left:0;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index > 0 ? 'block' : 'none'}">‹</button>
+          <img id="docs-lightbox-img" src="${images[index].src}" data-index="${index}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px" />
+          <button id="docs-lightbox-next" style="position:absolute;right:0;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index < images.length - 1 ? 'block' : 'none'}">›</button>
+          <div id="docs-lightbox-counter" style="position:absolute;bottom:-30px;color:rgba(255,255,255,0.5);font-size:0.85rem">${images.length > 1 ? `${index + 1} / ${images.length}` : ''}</div>
+        </div>
+      `,
+      background: 'transparent',
+      backdrop: 'rgba(0,0,0,0.85)',
+      showCloseButton: true,
+      showConfirmButton: false,
+      width: '90%',
+      didOpen: () => {
+        document.getElementById('docs-lightbox-prev').onclick = () => {
+          const cur = parseInt(document.getElementById('docs-lightbox-img').dataset.index);
+          if (cur > 0) showImage(cur - 1);
+        };
+        document.getElementById('docs-lightbox-next').onclick = () => {
+          const cur = parseInt(document.getElementById('docs-lightbox-img').dataset.index);
+          if (cur < images.length - 1) showImage(cur + 1);
+        };
+      },
+    });
+  };
+
   return (
-    <div className="docs-content">
+    <div className="docs-content" onClick={handleClick}>
       <div dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
@@ -278,61 +332,102 @@ function DocsContent({ doc }) {
 function DocsPage() {
   const navigate = useNavigate();
   const { docId } = useParams();
-  const currentDoc = docs.find(d => d.id === docId) || docs[0];
+  const currentDoc = docs.find((d) => d.id === docId) || docs[0];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#181a20', color: '#fff', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#181a20",
+        color: "#fff",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* 顶部栏 */}
-      <header style={{
-        height: '56px',
-        padding: '0 1.5rem',
-        background: 'rgba(24,24,26,0.95)',
-        borderBottom: '1px solid rgba(191,161,74,0.2)',
-        backdropFilter: 'blur(12px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <header
+        style={{
+          height: "56px",
+          padding: "0 1.5rem",
+          background: "rgba(24,24,26,0.95)",
+          borderBottom: "1px solid rgba(191,161,74,0.2)",
+          backdropFilter: "blur(12px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <button
             onClick={() => setMobileMenuOpen(true)}
-            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+            style={{
+              display: "none",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "4px",
+            }}
             className="docs-mobile-menu-btn"
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-              <path d="M4 6h16M4 12h16M4 18h16" stroke="#ffd700" strokeWidth="2" strokeLinecap="round"/>
+              <path
+                d="M4 6h16M4 12h16M4 18h16"
+                stroke="#ffd700"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ffd700', fontSize: '1.2rem', fontWeight: 700, letterSpacing: '2px', cursor: 'pointer' }} onClick={() => navigate('/')}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              color: "#ffd700",
+              fontSize: "1.2rem",
+              fontWeight: 700,
+              letterSpacing: "2px",
+              cursor: "pointer",
+            }}
+            onClick={() => navigate("/")}
+          >
             <span>📖</span> GHOST 文档中心
           </div>
         </div>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           style={{
-            background: 'rgba(191,161,74,0.1)',
-            border: '1px solid rgba(191,161,74,0.3)',
-            color: '#bfa14a',
-            padding: '0.4rem 1rem',
-            borderRadius: '8px',
-            fontSize: '0.85rem',
-            cursor: 'pointer',
+            background: "rgba(191,161,74,0.1)",
+            border: "1px solid rgba(191,161,74,0.3)",
+            color: "#bfa14a",
+            padding: "0.4rem 1rem",
+            borderRadius: "8px",
+            fontSize: "0.85rem",
+            cursor: "pointer",
           }}
         >
           ← 返回首页
         </button>
       </header>
 
-      <div style={{ display: 'flex', flex: 1 }}>
+      <div style={{ display: "flex", flex: 1 }}>
         {/* 移动端遮罩 */}
         {mobileMenuOpen && (
           <div
             onClick={() => setMobileMenuOpen(false)}
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 90 }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(0,0,0,0.5)",
+              zIndex: 90,
+            }}
           />
         )}
 
@@ -340,56 +435,71 @@ function DocsPage() {
         <aside
           className="docs-sidebar"
           style={{
-            width: '280px',
+            width: "280px",
             minHeight: 0,
-            borderRight: '1px solid rgba(191,161,74,0.1)',
-            background: 'rgba(20,20,24,0.6)',
-            position: mobileMenuOpen ? 'fixed' : 'relative',
+            borderRight: "1px solid rgba(191,161,74,0.1)",
+            background: "rgba(20,20,24,0.6)",
+            position: mobileMenuOpen ? "fixed" : "relative",
             left: mobileMenuOpen ? 0 : undefined,
-            top: mobileMenuOpen ? '56px' : undefined,
+            top: mobileMenuOpen ? "56px" : undefined,
             zIndex: mobileMenuOpen ? 100 : undefined,
-            height: mobileMenuOpen ? 'calc(100vh - 56px)' : undefined,
-            display: mobileMenuOpen ? 'block' : undefined,
+            height: mobileMenuOpen ? "calc(100vh - 56px)" : undefined,
+            display: mobileMenuOpen ? "block" : undefined,
           }}
         >
-          <SimpleBar style={{ height: 'calc(100vh - 56px)' }}>
-            <div style={{ padding: '1.5rem 0' }}>
-              {sidebarGroups.map(group => (
-                <div key={group.category} style={{ marginBottom: '1.5rem' }}>
-                  <div style={{
-                    padding: '0 1.5rem',
-                    fontSize: '0.7rem',
-                    fontWeight: 700,
-                    color: 'rgba(255,255,255,0.3)',
-                    letterSpacing: '2px',
-                    textTransform: 'uppercase',
-                    marginBottom: '0.5rem',
-                  }}>
+          <SimpleBar style={{ height: "calc(100vh - 56px)" }}>
+            <div style={{ padding: "1.5rem 0" }}>
+              {sidebarGroups.map((group) => (
+                <div key={group.category} style={{ marginBottom: "1.5rem" }}>
+                  <div
+                    style={{
+                      padding: "0 1.5rem",
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,0.3)",
+                      letterSpacing: "2px",
+                      textTransform: "uppercase",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
                     {group.category}
                   </div>
-                  {group.items.map(item => (
+                  {group.items.map((item) => (
                     <div
                       key={item.id}
-                      onClick={() => { navigate(`/docs/${item.id}`); setMobileMenuOpen(false); }}
-                      style={{
-                        padding: '0.6rem 1.5rem',
-                        cursor: 'pointer',
-                        fontSize: '0.9rem',
-                        color: currentDoc?.id === item.id ? '#ffd700' : 'rgba(255,255,255,0.6)',
-                        background: currentDoc?.id === item.id ? 'rgba(191,161,74,0.1)' : 'transparent',
-                        borderRight: currentDoc?.id === item.id ? '3px solid #ffd700' : '3px solid transparent',
-                        transition: 'all 0.2s',
+                      onClick={() => {
+                        navigate(`/docs/${item.id}`);
+                        setMobileMenuOpen(false);
                       }}
-                      onMouseEnter={e => {
+                      style={{
+                        padding: "0.6rem 1.5rem",
+                        cursor: "pointer",
+                        fontSize: "0.9rem",
+                        color:
+                          currentDoc?.id === item.id
+                            ? "#ffd700"
+                            : "rgba(255,255,255,0.6)",
+                        background:
+                          currentDoc?.id === item.id
+                            ? "rgba(191,161,74,0.1)"
+                            : "transparent",
+                        borderRight:
+                          currentDoc?.id === item.id
+                            ? "3px solid #ffd700"
+                            : "3px solid transparent",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
                         if (currentDoc?.id !== item.id) {
-                          e.currentTarget.style.background = 'rgba(191,161,74,0.05)';
-                          e.currentTarget.style.color = '#bfa14a';
+                          e.currentTarget.style.background =
+                            "rgba(191,161,74,0.05)";
+                          e.currentTarget.style.color = "#bfa14a";
                         }
                       }}
-                      onMouseLeave={e => {
+                      onMouseLeave={(e) => {
                         if (currentDoc?.id !== item.id) {
-                          e.currentTarget.style.background = 'transparent';
-                          e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = "rgba(255,255,255,0.6)";
                         }
                       }}
                     >
@@ -404,11 +514,17 @@ function DocsPage() {
 
         {/* 右侧内容 */}
         <main style={{ flex: 1, minWidth: 0 }}>
-          <SimpleBar style={{ height: 'calc(100vh - 56px)' }}>
-            <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2.5rem 2rem' }}>
+          <div style={{ height: "calc(100vh - 56px)", overflowY: "auto" }}>
+            <div
+              style={{
+                maxWidth: "800px",
+                margin: "0 auto",
+                padding: "2.5rem 2rem",
+              }}
+            >
               <DocsContent doc={currentDoc} />
             </div>
-          </SimpleBar>
+          </div>
         </main>
       </div>
 
@@ -489,6 +605,10 @@ function DocsPage() {
           border-radius: 8px;
           margin: 1rem auto;
           display: block;
+          min-height: 200px;
+          background: rgba(191,161,74,0.05);
+          object-fit: contain;
+          cursor: zoom-in;
         }
         .docs-content table {
           width: 100%;

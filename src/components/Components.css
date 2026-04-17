@@ -1,3 +1,12 @@
+/* Markdown 内容图片样式 */
+.markdown-content img {
+  max-width: 30%;
+  height: auto;
+  display: block;
+  margin: 15px auto;
+  border-radius: 6px;
+}
+
 /* 组件容器基础样式 */
 .component-container {
   width: 100%;

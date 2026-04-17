@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import supabase from '../services/supabaseClient';
+import { supabase } from '../services/supabaseClient';
 
 // 生成唯一邀请码
 

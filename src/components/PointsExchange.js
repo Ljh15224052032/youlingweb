@@ -1,125 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import './Components.css';
-import Swal from 'sweetalert2';
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
 import { supabase } from '../services/supabaseClient';
+import Swal from 'sweetalert2';
 import useUserStore from '../store/userStore';
-
-// 商品卡片样式
-const styles = {
-  itemImage: {
-    width: '100%',
-    height: '150px',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    marginBottom: '12px',
-    backgroundColor: '#1a1a1a',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  loadingContainer: {
-    padding: '20px',
-    textAlign: 'center',
-    color: '#999'
-  },
-  errorContainer: {
-    padding: '20px',
-    textAlign: 'center',
-    color: '#ff6b6b'
-  },
-  retryButton: {
-    padding: '8px 16px',
-    marginTop: '10px',
-    backgroundColor: '#666',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer'
-  },
-  placeholderImage: {
-    fontSize: '40px',
-    color: '#555'
-  }
-};
 
 function PointsExchange() {
   const [activeTab, setActiveTab] = useState('shop');
-  // 从userStore获取用户信息和积分
-  const { userInfo, updatePoints } = useUserStore();
+  const { userInfo, updatePoints, fetchUserByUsername } = useUserStore();
   const userPoints = userInfo.points || 0;
   const [shopItems, setShopItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userApplications, setUserApplications] = useState({});
-  const [loadingApplications, setLoadingApplications] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(true);
-  const [userType, setUserType] = useState('');
-  const [userTypeLoading, setUserTypeLoading] = useState(true);
-  
-  // 检查用户认证状态和用户类型
+
   useEffect(() => {
     const checkUserStatus = async () => {
       if (!userInfo.id) {
         setVerificationLoading(false);
-        setUserTypeLoading(false);
         return;
       }
-      
       try {
         const { data, error } = await supabase
           .from('users')
-          .select('is_verified, user_type')
+          .select('is_verified')
           .eq('id', userInfo.id)
           .single();
-        
         if (error) throw error;
-        
         setIsVerified(data.is_verified);
-        setUserType(data.user_type || '普通用户');
-      } catch (error) {
-        console.error('检查用户状态失败:', error);
+      } catch {
         setIsVerified(false);
-        setUserType('普通用户');
       } finally {
         setVerificationLoading(false);
-        setUserTypeLoading(false);
       }
     };
-    
     checkUserStatus();
   }, [userInfo.id]);
 
-  // 从Supabase获取积分兑换商品数据
-  // 获取用户的兑换申请状态
   const fetchUserApplications = async () => {
     if (!userInfo.id) return;
-    
     try {
-      setLoadingApplications(true);
-      
       const { data, error } = await supabase
         .from('points_exchange_applications')
         .select('*')
         .eq('user_id', userInfo.id);
-        
       if (error) throw error;
-      
-      // 将申请数据转换为以item_id为键的对象，方便查询
       const applications = {};
       data.forEach(app => {
         applications[app.item_id] = app.status;
       });
-      
       setUserApplications(applications);
-      console.log('用户兑换申请状态:', applications);
-      
-    } catch (err) {
-      console.error('获取用户兑换申请失败:', err);
-    } finally {
-      setLoadingApplications(false);
+    } catch {
+      // silent
     }
   };
 
@@ -127,349 +62,293 @@ function PointsExchange() {
     const fetchExchangeItems = async () => {
       try {
         setLoading(true);
-        
-        // 从points_exchange_items表获取商品数据
         const { data, error } = await supabase
           .from('points_exchange_items')
           .select('*')
           .order('created_at', { ascending: false });
-        
         if (error) throw error;
-        
-        // 将获取到的数据映射到组件所需的格式
-        const formattedItems = data.map(item => ({
-          id: item.id,
-          name: item.name,
-          description: item.description || `兑换 ${item.name}`, // 如果没有描述，使用默认描述
-          points: item.points_required,
-          stock: item.stock,
-          image: item.picture, // 使用picture字段作为商品图片
-          multipleExchange: item.multiple_exchange,
-          createdAt: item.created_at
-        }));
-        
-        setShopItems(formattedItems);
-        console.log('获取到的积分商品数据:', formattedItems);
+        setShopItems(data || []);
       } catch (err) {
-        console.error('获取积分商品数据失败:', err);
         setError(err.message);
-        
-        // 加载失败时使用默认数据
-        setShopItems([
-          {
-            id: 1,
-            name: 'VIP会员月卡',
-            description: '享受VIP专属权益，包括优先客服、专属活动等',
-            points: 500,
-            stock: 10,
-            image: 'https://via.placeholder.com/100'
-          },
-          {
-            id: 2,
-            name: '游领代币',
-            description: '兑换游领生态代币，参与生态建设',
-            points: 100,
-            stock: 999,
-            image: 'https://via.placeholder.com/100'
-          }
-        ]);
       } finally {
         setLoading(false);
       }
     };
-    
     fetchExchangeItems();
-    
-    // 如果用户已登录，获取用户的兑换申请状态
     if (userInfo.id) {
       fetchUserApplications();
     }
   }, [userInfo.id]);
 
-  // 兑换记录已移除
-
-  // 处理兑换申请
   const handleExchange = async (item) => {
-    // 检查是否已有该商品的申请
     if (userApplications[item.id]) {
       const status = userApplications[item.id];
-      
-      // 如果状态是已通过且允许多次兑换，则允许再次申请
-      if (status === 'approved' && item.multipleExchange) {
-        // 继续执行兑换流程，不返回
+      if (status === 'approved' && item.multiple_exchange) {
+        // 允许再次兑换
       } else {
-        // 其他状态显示提示信息
-        let statusText = '';
-        
-        switch(status) {
-          case 'pending':
-            statusText = '审核中';
-            break;
-          case 'approved':
-            statusText = '已兑换';
-            break;
-          case 'rejected':
-            statusText = '已拒绝';
-            break;
-          default:
-            statusText = status;
-        }
-        
+        const statusText = { pending: '审核中', approved: '已兑换', rejected: '已拒绝' }[status] || status;
         Swal.fire({
-          icon: 'info',
-          title: '已提交申请',
-          text: `您已经提交过此商品的兑换申请，当前状态: ${statusText}`,
-          background: '#1e222d',
-          color: '#d1d4dc',
-          confirmButtonColor: '#bfa14a',
-          confirmButtonText: '确定'
+          icon: 'info', title: '已提交申请',
+          text: `您已提交过此商品的兑换申请，当前状态: ${statusText}`,
+          background: '#1e222d', color: '#d1d4dc',
+          confirmButtonColor: '#bfa14a', confirmButtonText: '确定',
         });
         return;
       }
     }
-    
-    if (userPoints >= item.points) {
+
+    if (userPoints < item.points_required) {
       Swal.fire({
-        title: '确认兑换',
-        text: `确定要申请兑换 ${item.name} 吗？`,
-        html: `
-          <p>商品: ${item.name}</p>
-          <p>所需积分: ${item.points}</p>
-          <p>提交后将进入审核流程，审核通过后将自动扣除积分。</p>
-        `,
-        icon: 'question',
-        background: '#1e222d',
-        color: '#d1d4dc',
-        showCancelButton: true,
-        confirmButtonColor: '#bfa14a',
-        cancelButtonColor: '#666',
-        confirmButtonText: '确认申请',
-        cancelButtonText: '取消',
-        reverseButtons: true
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            // 提交兑换申请到points_exchange_applications表
-            const { error } = await supabase
-              .from('points_exchange_applications')
-              .insert([
-                {
-                  user_id: userInfo.id,
-                  item_id: item.id,
-                  status: 'pending',
-                  created_at: new Date(),
-                  updated_at: new Date()
-                }
-              ]);
-              
-            if (error) throw error;
-            
-            // 更新本地申请状态
-            setUserApplications(prev => ({
-              ...prev,
-              [item.id]: 'pending'
-            }));
-            
-            Swal.fire({
-              icon: 'success',
-              title: '申请提交成功！',
-              text: `您的兑换申请已提交，请等待管理员审核`,
-              background: '#1e222d',
-              color: '#d1d4dc',
-              confirmButtonColor: '#bfa14a',
-              confirmButtonText: '确定',
-              timer: 2000,
-              timerProgressBar: true
-            });
-          } catch (error) {
-            console.error('提交兑换申请失败:', error);
-            Swal.fire({
-              icon: 'error',
-              title: '申请提交失败',
-              text: `提交失败: ${error.message || '请稍后重试'}`,
-              background: '#1e222d',
-              color: '#d1d4dc',
-              confirmButtonColor: '#ef5350',
-              confirmButtonText: '确定'
-            });
-          }
-        }
+        icon: 'error', title: '积分不足',
+        text: `需要 ${item.points_required} 积分，当前 ${userPoints} 积分`,
+        background: '#1e222d', color: '#d1d4dc',
+        confirmButtonColor: '#ef5350', confirmButtonText: '确定',
+        timer: 2000, timerProgressBar: true,
       });
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: '积分不足',
-        text: '您的积分不足，无法兑换此商品',
-        background: '#1e222d',
-        color: '#d1d4dc',
-        confirmButtonColor: '#ef5350',
-        confirmButtonText: '确定',
-        timer: 2000,
-        timerProgressBar: true
-      });
+      return;
     }
+
+    Swal.fire({
+      title: '确认兑换',
+      html: `
+        <div style="text-align:left;line-height:2">
+          <p><b>商品：</b>${item.name}</p>
+          <p><b>所需积分：</b>${item.points_required}</p>
+          <p style="color:rgba(255,255,255,0.5);font-size:0.85rem">提交后将进入审核流程，审核通过后自动扣除积分</p>
+        </div>
+      `,
+      icon: 'question',
+      background: '#1e222d', color: '#d1d4dc',
+      showCancelButton: true,
+      confirmButtonColor: '#bfa14a', cancelButtonColor: '#666',
+      confirmButtonText: '确认申请', cancelButtonText: '取消',
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+      try {
+        const { error } = await supabase
+          .from('points_exchange_applications')
+          .insert([{
+            user_id: userInfo.id,
+            item_id: item.id,
+            status: 'pending',
+            created_at: new Date(),
+            updated_at: new Date(),
+          }]);
+        if (error) throw error;
+
+        setUserApplications(prev => ({ ...prev, [item.id]: 'pending' }));
+
+        // 刷新积分
+        if (userInfo.email) {
+          await fetchUserByUsername(userInfo.email);
+        }
+
+        Swal.fire({
+          icon: 'success', title: '申请提交成功',
+          text: '请等待管理员审核',
+          background: '#1e222d', color: '#d1d4dc',
+          confirmButtonColor: '#bfa14a', confirmButtonText: '确定',
+          timer: 2000, timerProgressBar: true,
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: 'error', title: '提交失败',
+          text: err?.message || '请稍后重试',
+          background: '#1e222d', color: '#d1d4dc',
+          confirmButtonColor: '#ef5350', confirmButtonText: '确定',
+        });
+      }
+    });
   };
 
-  const renderShopTab = () => (
-    <div className="shop-content">
-      <div className="points-display">
-        <h3>我的积分</h3>
-        <div className="points-value">{userPoints}</div>
-        <button className="earn-points-btn" onClick={() => setActiveTab('earn')}>赚取积分</button>
-      </div>
-      
-      {loading ? (
-        <div style={styles.loadingContainer}>
-          <p>正在加载商品信息...</p>
-          <div className="loading-spinner"></div>
-        </div>
-      ) : error ? (
-        <div style={styles.errorContainer}>
-          <p>加载失败: {error}</p>
-          <button onClick={() => window.location.reload()} style={styles.retryButton}>重试</button>
-        </div>
-      ) : (
-        <div className="shop-grid">
-          {shopItems.map(item => (
-            <div key={item.id} className="shop-item">
-              <div className="item-image" style={styles.itemImage}>
-                {item.image ? (
-                  <img 
-                    src={item.image} 
-                    alt={item.name}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'scale-down'
-                    }}
-                  />
-                ) : (
-                  <div style={styles.placeholderImage}>🎁</div>
-                )}
-              </div>
-              <div className="item-info">
-                <h4>{item.name}</h4>
-                <p>{item.description}</p>
-                <div className="item-meta">
-                  <span className="points-cost">{item.points} 积分</span>
-                </div>
-                <div className="item-stock">库存：{item.stock}</div>
-              </div>
-              <button 
-                className="exchange-btn"
-                onClick={() => handleExchange(item)}
-                disabled={
-                  userPoints < item.points || 
-                  item.stock === 0 || 
-                  userApplications[item.id] === 'pending' || 
-                  (userApplications[item.id] === 'approved' && !item.multipleExchange)
-                }
-              >
-                {getButtonText(item)}
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
-  // 兑换记录选项卡已移除
-
-  // 获取按钮显示文本
   const getButtonText = (item) => {
-    // 检查是否有该商品的申请记录
     if (userApplications[item.id]) {
       const status = userApplications[item.id];
-      switch(status) {
-        case 'pending':
-          return '审核中';
-        case 'approved':
-          // 如果已通过审核，根据multiple_exchange决定按钮文本
-          return item.multipleExchange ? '再次兑换' : '已兑换';
-        case 'rejected':
-          return '已拒绝';
-        default:
-          return status;
-      }
+      if (status === 'pending') return '审核中';
+      if (status === 'approved') return item.multiple_exchange ? '再次兑换' : '已兑换';
+      if (status === 'rejected') return '重新申请';
+      return status;
     }
-    
-    // 没有申请记录，显示常规状态
-    if (userPoints < item.points) {
-      return '积分不足';
-    } else if (item.stock === 0) {
-      return '已售罄';
-    } else {
-      return '立即兑换';
-    }
+    if (userPoints < item.points_required) return '积分不足';
+    if (item.stock === 0) return '已售罄';
+    return '立即兑换';
   };
 
-  const renderEarnTab = () => (
-    <div className="earn-content">
-      <div className="earn-header">
-        <h3>赚取积分</h3>
-        <p>通过以下方式获得更多积分</p>
+  const isButtonDisabled = (item) => {
+    if (userPoints < item.points_required) return true;
+    if (item.stock === 0) return true;
+    if (userApplications[item.id] === 'pending') return true;
+    if (userApplications[item.id] === 'approved' && !item.multiple_exchange) return true;
+    return false;
+  };
+
+  const earnMethods = [
+    { icon: '📝', title: '注册账号', desc: '完成注册即送 50 积分', points: '+50' },
+    { icon: '✉️', title: '绑定邮箱', desc: '验证邮箱后获得奖励', points: '+20' },
+    { icon: '🎯', title: '完成空投任务', desc: '参与空投活动并通过审核', points: '根据活动' },
+    { icon: '👥', title: '邀请好友', desc: '好友通过你的邀请码注册', points: '+30/人' },
+    { icon: '📖', title: '每日学习', desc: '每日阅读新手指南或合约教学', points: '+5/天' },
+  ];
+
+  if (verificationLoading) {
+    return (
+      <div className="component-container">
+        <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>验证用户状态中...</div>
       </div>
-      
-      <div className="earn-methods">
-        
-        
-      
-        
-        <div className="earn-method">
-          <div className="method-icon">🎯</div>
-          <div className="method-info">
-            <h4>完成空投任务</h4>
-          </div>
-        </div>
-        
-        <div className="earn-method">
-          <div className="method-icon">...</div>
-          <div className="method-info">
-            <h4>敬请期待</h4>
-          </div>
+    );
+  }
+
+  if (!isVerified) {
+    return (
+      <div className="component-container">
+        <div className="verification-required">
+          <h2>需要账号验证</h2>
+          <p>请先完成账号验证（绑定 UID）后再访问此页面</p>
         </div>
       </div>
-      
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="component-container">
-      {verificationLoading || userTypeLoading ? (
-        <div className="loading-container">
-          <p>验证用户状态中...</p>
-        </div>
-      ) : !isVerified ? (
-        <div className="verification-required">
-          <h2>需要账号验证</h2>
-          <p>请先完成账号验证（绑定UID）后再访问此页面</p>
-        </div>
-      ) : (
-        <div className="exchange-layout">
-          <div className="exchange-tabs">
-            <button 
-              className={`tab-btn ${activeTab === 'shop' ? 'active' : ''}`}
-              onClick={() => setActiveTab('shop')}
-            >
-              积分商城
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'earn' ? 'active' : ''}`}
-              onClick={() => setActiveTab('earn')}
-            >
-              赚取积分
-            </button>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 1rem' }}>
+        {/* 积分显示 + Tab */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+          <div style={{
+            background: 'rgba(24,24,26,0.9)',
+            border: '1px solid rgba(191,161,74,0.2)',
+            borderRadius: '12px',
+            padding: '0.8rem 1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+          }}>
+            <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>我的积分</span>
+            <span style={{ color: '#ffd700', fontSize: '1.5rem', fontWeight: 700 }}>{userPoints}</span>
           </div>
-          
-          <SimpleBar style={{height: 'calc(100vh - 200px)'}} className="exchange-main">
-            {activeTab === 'shop' && renderShopTab()}
-            {activeTab === 'earn' && renderEarnTab()}
-          </SimpleBar>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={() => setActiveTab('shop')}
+              style={{
+                padding: '0.5rem 1.2rem', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer', border: 'none',
+                background: activeTab === 'shop' ? 'rgba(191,161,74,0.25)' : 'transparent',
+                color: activeTab === 'shop' ? '#ffd700' : 'rgba(255,255,255,0.5)',
+              }}
+            >积分商城</button>
+            <button
+              onClick={() => setActiveTab('earn')}
+              style={{
+                padding: '0.5rem 1.2rem', borderRadius: '8px', fontSize: '0.9rem', cursor: 'pointer', border: 'none',
+                background: activeTab === 'earn' ? 'rgba(191,161,74,0.25)' : 'transparent',
+                color: activeTab === 'earn' ? '#ffd700' : 'rgba(255,255,255,0.5)',
+              }}
+            >赚取积分</button>
+          </div>
         </div>
-      )}
+
+        <SimpleBar style={{ height: 'calc(100vh - 220px)' }}>
+          {activeTab === 'shop' && (
+            loading ? (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>加载中...</div>
+            ) : error ? (
+              <div style={{ textAlign: 'center', padding: '3rem', color: '#ff6b6b' }}>
+                <p>加载失败：{error}</p>
+                <button onClick={() => window.location.reload()} style={{ marginTop: '0.5rem', padding: '0.4rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)', background: 'none', color: '#fff', cursor: 'pointer' }}>重试</button>
+              </div>
+            ) : shopItems.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>暂无可兑换商品</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+                {shopItems.map(item => (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: 'rgba(24,24,26,0.9)',
+                      border: '1px solid rgba(191,161,74,0.15)',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      transition: 'all 0.3s',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = 'rgba(191,161,74,0.5)';
+                      e.currentTarget.style.boxShadow = '0 0 12px rgba(191,161,74,0.2)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = 'rgba(191,161,74,0.15)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <div style={{ width: '100%', height: '140px', background: 'rgba(255,255,255,0.03)', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                      {item.picture ? (
+                        <img src={item.picture} alt={item.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'scale-down' }} />
+                      ) : (
+                        <span style={{ fontSize: '2.5rem', opacity: 0.3 }}>🎁</span>
+                      )}
+                    </div>
+                    <div style={{ padding: '1rem' }}>
+                      <h4 style={{ margin: '0 0 0.3rem', color: '#ffd700', fontSize: '0.95rem' }}>{item.name}</h4>
+                      {item.description && (
+                        <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.6rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {item.description}
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                        <span style={{ color: '#ffd700', fontWeight: 600, fontSize: '0.95rem' }}>{item.points_required} 积分</span>
+                        <span style={{ fontSize: '0.8rem', color: item.stock > 0 ? 'rgba(255,255,255,0.3)' : '#ff6b6b' }}>
+                          库存 {item.stock}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleExchange(item)}
+                        disabled={isButtonDisabled(item)}
+                        style={{
+                          width: '100%', padding: '0.5rem', borderRadius: '8px', border: 'none',
+                          background: isButtonDisabled(item) ? 'rgba(255,255,255,0.05)' : 'rgba(191,161,74,0.15)',
+                          color: isButtonDisabled(item) ? 'rgba(255,255,255,0.3)' : '#ffd700',
+                          fontSize: '0.85rem', cursor: isButtonDisabled(item) ? 'not-allowed' : 'pointer',
+                        }}
+                      >
+                        {getButtonText(item)}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          )}
+
+          {activeTab === 'earn' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {earnMethods.map((method, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    background: 'rgba(24,24,26,0.9)',
+                    border: '1px solid rgba(191,161,74,0.1)',
+                    borderRadius: '10px',
+                    padding: '1rem 1.2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                  }}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>{method.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ color: '#ffd700', fontSize: '0.95rem', fontWeight: 500 }}>{method.title}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginTop: '0.2rem' }}>{method.desc}</div>
+                  </div>
+                  <span style={{ color: '#00ff88', fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap' }}>{method.points}</span>
+                </div>
+              ))}
+              <div style={{ textAlign: 'center', padding: '1.5rem', color: 'rgba(255,255,255,0.3)', fontSize: '0.85rem' }}>
+                更多赚取积分的方式即将开放
+              </div>
+            </div>
+          )}
+        </SimpleBar>
+      </div>
     </div>
   );
 }
 
-export default PointsExchange; 
+export default PointsExchange;

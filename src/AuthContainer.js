@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Login from './Login';
 import Register from './Register';
 import ForgotPassword from './ForgotPassword';
-import useUserStore from './store/userStore';
 import './Login.css';
 
-function AuthContainer() {
-  const [page, setPage] = useState('login'); // login/register/forgot
-  const { login } = useUserStore();
+function AuthContainer({ page }) {
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // 只初始化一次粒子特效
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js';
     script.async = true;
@@ -51,19 +49,37 @@ function AuthContainer() {
 
   let content = null;
   if (page === 'login') {
-    content = <Login onLogin={login} onSwitch={setPage} />;
+    content = <Login />;
   } else if (page === 'register') {
-    content = <Register onBack={() => setPage('login')} />;
+    content = <Register />;
   } else if (page === 'forgot') {
-    content = <ForgotPassword onBack={() => setPage('login')} />;
+    content = <ForgotPassword />;
   }
 
   return (
     <div className="login-bg">
       <div id="particles-js"></div>
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          left: '20px',
+          zIndex: 200,
+          background: 'rgba(24,24,26,0.8)',
+          border: '1px solid #bfa14a',
+          color: '#ffd700',
+          padding: '8px 20px',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '0.9rem',
+        }}
+      >
+        ← 返回首页
+      </button>
       {content}
     </div>
   );
 }
 
-export default AuthContainer; 
+export default AuthContainer;

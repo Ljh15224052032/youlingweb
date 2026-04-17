@@ -42,13 +42,6 @@ function ContractTutorial() {
       const verified = data.is_verified;
       const type = data.user_type || '普通用户';
       
-      console.log('【合约教学】用户状态:', {
-        id: userInfo.id,
-        verified: verified,
-        type: type,
-        time: new Date().toLocaleTimeString()
-      });
-      
       setIsVerified(verified);
       setUserType(type);
     } catch (error) {
@@ -64,18 +57,6 @@ function ContractTutorial() {
   // 每次组件渲染时检查用户状态
   useEffect(() => {
     checkUserStatus();
-    
-    // 添加组件挂载时的日志
-    console.log('【合约教学】组件挂载/更新:', {
-      mounted: true,
-      time: new Date().toLocaleTimeString()
-    });
-    
-    return () => {
-      console.log('【合约教学】组件卸载:', {
-        time: new Date().toLocaleTimeString()
-      });
-    };
   }, [userInfo.id]);
 
   // 从Supabase获取合约教学数据
@@ -127,9 +108,7 @@ function ContractTutorial() {
           } catch (e) {
             console.error('解析标签失败:', e, tutorial.tags);
           }
-          
-          console.log('解析到的标签:', tags);
-          
+
           // 选择第一个标签作为level，如果没有则默认为"基础"
           const level = tags && tags.length > 0 ? tags[0] : '基础';
           
@@ -147,9 +126,8 @@ function ContractTutorial() {
             created_at: tutorial.created_at
           };
         });
-        
+
         setTutorials(processedTutorials);
-        console.log('获取到的合约教学数据:', processedTutorials);
       } catch (err) {
         console.error('获取合约教学数据失败:', err);
         setError(err.message);
@@ -181,27 +159,6 @@ function ContractTutorial() {
       setExpandedTutorial(tutorial);
     }
   };
-
-  // 自定义样式 - 特别是用于处理Markdown中的图片显示
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      .markdown-content img {
-        max-width: 30%; /* 控制图片大小 */
-        height: auto;
-        display: block;
-        margin: 15px auto;
-        border-radius: 6px;
-        border: 1px solid #333;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
 
   return (
     <SimpleBar className="component-container tutorial-scroll">

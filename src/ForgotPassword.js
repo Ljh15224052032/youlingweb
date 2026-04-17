@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
-function ForgotPassword({ onBack }) {
+import { supabase } from './services/supabaseClient';
+import bcrypt from 'bcryptjs';
+import Swal from 'sweetalert2';
+
+function ForgotPassword() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [code, setCode] = useState('');
-  const [sent, setSent] = useState(false);
-  const [verify, setVerify] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [serverCode, setServerCode] = useState(''); // mock
+  const [submitting, setSubmitting] = useState(false);
+  const [emailChecked, setEmailChecked] = useState(false);
 
-  // 校验邮箱格式
   const validateEmail = (value) => {
     return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
   };
@@ -23,8 +26,7 @@ function ForgotPassword({ onBack }) {
     }
   };
 
-  // 模拟发送验证码
-  const handleSendCode = () => {
+  const handleCheckEmail = async () => {
     if (!email) {
       setEmailError('请输入邮箱');
       return;
@@ -33,103 +35,127 @@ function ForgotPassword({ onBack }) {
       setEmailError('请输入有效的邮箱地址');
       return;
     }
-    setEmailError('');
-    const mockCode = '123456';
-    setServerCode(mockCode);
-    setSent(true);
-    alert('验证码已发送到邮箱（模拟: 123456）');
-  };
 
-  // 验证验证码
-  const handleVerifyCode = () => {
-    if (code === serverCode) {
-      setVerify(true);
-    } else {
-      alert('验证码错误');
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', email)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        setEmailError('该邮箱未注册');
+        return;
+      }
+
+      setEmailChecked(true);
+      setEmailError('');
+    } catch (err) {
+      Swal.fire({
+        icon: 'error', title: '查询失败',
+        text: err?.message || '请稍后重试',
+        background: '#1e222d', color: '#d1d4dc',
+        confirmButtonColor: '#ef5350', confirmButtonText: '确定',
+      });
     }
   };
 
-  // 重置密码
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newPassword || !confirm) {
-      alert('请填写新密码');
+    if (!newPassword || newPassword.length < 8) {
+      Swal.fire({
+        icon: 'warning', title: '密码要求',
+        text: '新密码至少需要 8 位',
+        background: '#1e222d', color: '#d1d4dc',
+        confirmButtonColor: '#bfa14a', confirmButtonText: '确定',
+      });
       return;
     }
     if (newPassword !== confirm) {
-      alert('两次密码不一致');
+      Swal.fire({
+        icon: 'warning', title: '密码不一致',
+        text: '两次输入的密码不相同',
+        background: '#1e222d', color: '#d1d4dc',
+        confirmButtonColor: '#bfa14a', confirmButtonText: '确定',
+      });
       return;
     }
-    alert('密码重置成功！');
-    onBack();
+
+    try {
+      setSubmitting(true);
+      const passwordHash = await bcrypt.hash(newPassword, 10);
+
+      const { error } = await supabase
+        .from('users')
+        .update({ password_hash: passwordHash })
+        .eq('username', email);
+
+      if (error) throw error;
+
+      Swal.fire({
+        icon: 'success', title: '重置成功',
+        text: '密码已更新，请使用新密码登录',
+        background: '#1e222d', color: '#d1d4dc',
+        confirmButtonColor: '#bfa14a', confirmButtonText: '去登录',
+      }).then(() => navigate('/login'));
+    } catch (err) {
+      Swal.fire({
+        icon: 'error', title: '重置失败',
+        text: err?.message || '请稍后重试',
+        background: '#1e222d', color: '#d1d4dc',
+        confirmButtonColor: '#ef5350', confirmButtonText: '确定',
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-      <div className="login-form">
-        <div className="ghost-logo">GHOST</div>
-        <form className="glass-card" onSubmit={verify ? handleSubmit : e => e.preventDefault()}>
-          <h2 className="login-title">重置密码</h2>
-          <input
-            type="text"
-            placeholder="邮箱"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            disabled={sent}
-            onBlur={handleEmailBlur}
-            className={emailError ? 'input-error' : ''}
-          />
-          {emailError && <div className="input-error-text">{emailError}</div>}
-          {!sent && (
-            <button type="button" style={{
-              width:'100%',
-              marginBottom:'1rem',
-              padding: '0.9rem 0',
+    <div className="login-form">
+      <div className="ghost-logo">GHOST</div>
+      <form className="glass-card" onSubmit={emailChecked ? handleSubmit : e => e.preventDefault()}>
+        <h2 className="login-title">重置密码</h2>
+
+        <input
+          type="text"
+          placeholder="邮箱"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          disabled={emailChecked}
+          onBlur={handleEmailBlur}
+          className={emailError ? 'input-error' : ''}
+        />
+        {emailError && <div className="input-error-text">{emailError}</div>}
+
+        {!emailChecked ? (
+          <button type="button" style={{
+            width: '100%', marginBottom: '1rem', padding: '0.9rem 0',
+            background: 'linear-gradient(90deg, #bfa14a 60%, #ffd700 100%)',
+            color: '#18181a', border: 'none', borderRadius: '8px',
+            fontWeight: '700', cursor: 'pointer',
+          }} onClick={handleCheckEmail}>下一步</button>
+        ) : (
+          <>
+            <input type="password" placeholder="新密码（至少 8 位）" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+            <input type="password" placeholder="确认新密码" value={confirm} onChange={e => setConfirm(e.target.value)} />
+            <button type="submit" disabled={submitting} style={{
+              width: '100%', padding: '0.9rem 0',
               background: 'linear-gradient(90deg, #bfa14a 60%, #ffd700 100%)',
-              color: '#18181a',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: '700',
-              cursor: 'pointer'
-            }} onClick={handleSendCode}>发送验证码</button>
-          )}
-          {sent && !verify && (
-            <>
-              <input type="text" placeholder="输入验证码" value={code} onChange={e => setCode(e.target.value)} />
-              <button type="button" style={{
-                width:'100%',
-                marginBottom:'1rem',
-                padding: '0.9rem 0',
-                background: 'linear-gradient(90deg, #bfa14a 60%, #ffd700 100%)',
-                color: '#18181a',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '700',
-                cursor: 'pointer'
-              }} onClick={handleVerifyCode}>验证验证码</button>
-            </>
-          )}
-          {verify && (
-            <>
-              <input type="password" placeholder="新密码" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
-              <input type="password" placeholder="确认新密码" value={confirm} onChange={e => setConfirm(e.target.value)} />
-              <button type="submit" style={{
-                width:'100%',
-                padding: '0.9rem 0',
-                background: 'linear-gradient(90deg, #bfa14a 60%, #ffd700 100%)',
-                color: '#18181a',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '700',
-                cursor: 'pointer'
-              }}>提交</button>
-            </>
-          )}
-          <div className="login-actions" style={{width:'20%',display:'flex',justifyContent:'left',alignItems:'center'}}>
-            <button type="button" className="action-btn" onClick={onBack} style={{width:'100%',background:'none',boxShadow:'none'}}>返回登录</button>
-          </div>
-        </form>
-      </div>
+              color: '#18181a', border: 'none', borderRadius: '8px',
+              fontWeight: '700', cursor: submitting ? 'wait' : 'pointer',
+              opacity: submitting ? 0.6 : 1,
+            }}>{submitting ? '提交中...' : '重置密码'}</button>
+          </>
+        )}
+
+        <div className="login-actions" style={{ width: '20%', display: 'flex', justifyContent: 'left', alignItems: 'center' }}>
+          <button type="button" className="action-btn" onClick={() => navigate('/login')} style={{ width: '100%', background: 'none', boxShadow: 'none' }}>返回登录</button>
+        </div>
+      </form>
+    </div>
   );
 }
 
-export default ForgotPassword; 
+export default ForgotPassword;

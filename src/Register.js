@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import bcrypt from 'bcryptjs';
-import supabase from './services/supabaseClient';
+import { supabase } from './services/supabaseClient';
 import Swal from 'sweetalert2';
-function Register({ onBack }) {
+function Register() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -82,7 +84,11 @@ function Register({ onBack }) {
         throw existErr;
       }
       if (Array.isArray(existedUsers) && existedUsers.length > 0) {
-        alert('该邮箱已注册');
+        Swal.fire({
+          icon: 'warning', title: '该邮箱已注册',
+          background: '#1e222d', color: '#d1d4dc',
+          confirmButtonColor: '#bfa14a', confirmButtonText: '确定',
+        });
         return;
       }
 
@@ -105,12 +111,20 @@ function Register({ onBack }) {
         throw insertErr;
       }
 
-      alert('注册成功！请使用邮箱和密码登录。');
-      onBack();
+      Swal.fire({
+        icon: 'success', title: '注册成功',
+        text: '请使用邮箱和密码登录',
+        background: '#1e222d', color: '#d1d4dc',
+        confirmButtonColor: '#bfa14a', confirmButtonText: '去登录',
+      }).then(() => navigate('/login'));
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('注册失败：', err);
-      alert(`注册失败：${err?.message || '请稍后重试'}`);
+      Swal.fire({
+        icon: 'error', title: '注册失败',
+        text: err?.message || '请稍后重试',
+        background: '#1e222d', color: '#d1d4dc',
+        confirmButtonColor: '#ef5350', confirmButtonText: '确定',
+      });
     } finally {
       setSubmitting(false);
     }
@@ -128,7 +142,7 @@ function Register({ onBack }) {
           <input type="text" placeholder="邀请码" value={inviteCode} onChange={e => setInviteCode(e.target.value)} />
           <button type="submit" disabled={submitting}>{submitting ? '提交中...' : '注册'}</button>
           <div className="login-actions" style={{width:'20%',display:'flex',justifyContent:'left',alignItems:'center'}}>
-            <button type="button" className="action-btn" onClick={onBack} style={{width:'100%',background:'none',boxShadow:'none'}}>返回登录</button>
+            <button type="button" className="action-btn" onClick={() => navigate('/login')} style={{width:'100%',background:'none',boxShadow:'none'}}>返回登录</button>
           </div>
         </form>
       </div>

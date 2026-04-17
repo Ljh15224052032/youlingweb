@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import bcrypt from 'bcryptjs';
-import supabase from './services/supabaseClient';
+import { supabase } from './services/supabaseClient';
+import useUserStore from './store/userStore';
 
-function Login({ onLogin, onSwitch }) {
+function Login() {
+  const navigate = useNavigate();
+  const login = useUserStore(state => state.login);
   const [emailError, setEmailError] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,11 +64,12 @@ function Login({ onLogin, onSwitch }) {
         return;
       }
 
-      // 登录成功，传递用户数据给 store
-      onLogin({
-        username: email, // 传递邮箱作为 username，让 login 方法去查询 Supabase
+      // 登录成功，调用 store 登录并跳转
+      await login({
+        username: email,
         email: email,
       });
+      navigate('/dashboard');
 
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -97,8 +102,8 @@ function Login({ onLogin, onSwitch }) {
         />
         <button type="submit" disabled={submitting}>{submitting ? '登录中...' : '登录'}</button>
         <div className="login-actions">
-          <button type="button" className="action-btn" style={{width:'20%', background:'none',boxShadow:'none'}} onClick={() => onSwitch('register')}>注册</button>
-          <button type="button" className="action-btn" style={{width:'20%', background:'none',boxShadow:'none'}} onClick={() => onSwitch('forgot')}>忘记密码</button>
+          <button type="button" className="action-btn" style={{width:'20%', background:'none',boxShadow:'none'}} onClick={() => navigate('/register')}>注册</button>
+          <button type="button" className="action-btn" style={{width:'20%', background:'none',boxShadow:'none'}} onClick={() => navigate('/forgot')}>忘记密码</button>
         </div>
       </form>
     </div>

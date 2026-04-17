@@ -5,7 +5,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import { supabase } from '../services/supabaseClient';
 import Swal from 'sweetalert2';
 import useUserStore from '../store/userStore';
-import { marked } from 'marked';
+import { safeMarkdown, escapeHtml } from '../utils/sanitize';
 
 function Airdrop() {
   const [airdrops, setAirdrops] = useState([]);
@@ -81,10 +81,10 @@ function Airdrop() {
             : `<div style="color:rgba(255,255,255,0.4);text-align:center;padding:2rem">暂无详细活动内容</div>`
           }
           <div class="airdrop-popup-info">
-            <p><b>奖励：</b>${airdrop.reward || '暂无'}</p>
-            <p><b>开始时间：</b>${airdrop.start_time || '待定'}</p>
-            <p><b>结束时间：</b>${airdrop.end_time || '待定'}</p>
-            <p><b>状态：</b>${getStatusText(airdrop.status)}</p>
+            <p><b>奖励：</b>${escapeHtml(airdrop.reward || '暂无')}</p>
+            <p><b>开始时间：</b>${escapeHtml(airdrop.start_time || '待定')}</p>
+            <p><b>结束时间：</b>${escapeHtml(airdrop.end_time || '待定')}</p>
+            <p><b>状态：</b>${escapeHtml(getStatusText(airdrop.status))}</p>
           </div>
         </div>
       `,
@@ -99,8 +99,7 @@ function Airdrop() {
         if (airdrop.content) {
           const container = document.getElementById('markdown-content-container');
           try {
-            marked.setOptions({ breaks: true, gfm: true });
-            container.innerHTML = marked.parse(airdrop.content);
+            container.innerHTML = safeMarkdown(airdrop.content);
             container.querySelectorAll('img').forEach(img => {
               img.style.maxWidth = '30%';
               img.style.height = 'auto';

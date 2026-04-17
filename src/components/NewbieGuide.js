@@ -6,6 +6,7 @@ import { supabase } from '../services/supabaseClient';
 import useUserStore from '../store/userStore';
 import { marked } from 'marked';
 import Swal from 'sweetalert2';
+import { safeMarkdown, escapeHtml } from '../utils/sanitize';
 
 function NewbieGuide() {
   const [guides, setGuides] = useState([]);
@@ -71,10 +72,10 @@ function NewbieGuide() {
       width: '70%',
       html: `
         <div class="guide-popup-content">
-          ${guide.cover_image ? `<img src="${guide.cover_image}" style="max-width:100%;max-height:200px;border-radius:8px;margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto" />` : ''}
+          ${guide.cover_image ? `<img src="${escapeHtml(guide.cover_image)}" style="max-width:100%;max-height:200px;border-radius:8px;margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto" />` : ''}
           ${guide.content ? '<div id="guide-markdown-content"></div>' : '<div style="color:rgba(255,255,255,0.4);text-align:center;padding:2rem">暂无内容</div>'}
           <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid rgba(255,255,255,0.1);font-size:0.85rem;color:rgba(255,255,255,0.4)">
-            <span>分类：${guide.category || '未分类'}</span>
+            <span>分类：${escapeHtml(guide.category || '未分类')}</span>
           </div>
         </div>
       `,
@@ -87,7 +88,7 @@ function NewbieGuide() {
           const container = document.getElementById('guide-markdown-content');
           try {
             marked.setOptions({ breaks: true, gfm: true });
-            container.innerHTML = marked.parse(guide.content);
+            container.innerHTML = safeMarkdown(guide.content);
             container.querySelectorAll('img').forEach(img => {
               img.style.maxWidth = '30%';
               img.style.height = 'auto';

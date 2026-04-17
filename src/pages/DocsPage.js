@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
-import { marked } from "marked";
 import Swal from "sweetalert2";
+import { safeMarkdown } from "../utils/sanitize";
 
 const docs = [
   {
@@ -276,7 +276,7 @@ function DocsContent({ doc }) {
     );
   }
 
-  const html = marked.parse(doc.content, { breaks: true, gfm: true });
+  const html = safeMarkdown(doc.content);
 
   const handleClick = (e) => {
     if (e.target.tagName !== "IMG") return;

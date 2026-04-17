@@ -5,6 +5,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import { supabase } from '../services/supabaseClient';
 import Swal from 'sweetalert2';
 import useUserStore from '../store/userStore';
+import { escapeHtml } from '../utils/sanitize';
 
 function PointsExchange() {
   const [activeTab, setActiveTab] = useState('shop');
@@ -113,8 +114,8 @@ function PointsExchange() {
       title: '确认兑换',
       html: `
         <div style="text-align:left;line-height:2">
-          <p><b>商品：</b>${item.name}</p>
-          <p><b>所需积分：</b>${item.points_required}</p>
+          <p><b>商品：</b>${escapeHtml(item.name)}</p>
+          <p><b>所需积分：</b>${escapeHtml(item.points_required)}</p>
           <p style="color:rgba(255,255,255,0.5);font-size:0.85rem">提交后将进入审核流程，审核通过后自动扣除积分</p>
         </div>
       `,

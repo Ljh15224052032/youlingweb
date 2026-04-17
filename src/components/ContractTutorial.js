@@ -3,9 +3,8 @@ import './Components.css';
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
 import { supabase } from '../services/supabaseClient';
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
 import useUserStore from '../store/userStore';
+import { safeMarkdown } from '../utils/sanitize';
 
 function ContractTutorial() {
   const [tutorials, setTutorials] = useState([]);
@@ -210,10 +209,7 @@ function ContractTutorial() {
                     
                     
                     <div className="tutorial-detailed-content markdown-content">
-                      {/* 使用ReactMarkdown渲染Markdown内容 */}
-                      <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                        {tutorial.content}
-                      </ReactMarkdown>
+                      <div dangerouslySetInnerHTML={{ __html: safeMarkdown(tutorial.content) }} />
                     </div>
                   </div>
                 </div>

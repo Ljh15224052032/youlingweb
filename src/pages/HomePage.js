@@ -57,7 +57,7 @@ const tutorials = [
   {
     title: '新手入门完整教程',
     desc: '从零开始的 Web3 入门指南，涵盖区块链、钱包、交易所等核心知识',
-    link: 'https://docs.google.com/document/d/1rjj-2mnlccLuymckGrW5txIZX8Mpv4f_mbh1IeJ1kZ8/edit?usp=sharing',
+    docId: 'download-binance',
   },
 ];
 
@@ -115,7 +115,7 @@ function HomePage() {
         <div className="hp-nav-logo">GHOST <LogoIcon size={28} /></div>
         <div className="hp-nav-links">
           <button onClick={() => scrollTo('hero')}>首页</button>
-          <button onClick={() => navigate('/docs')}>文档中心</button>
+          <button onClick={() => navigate('/docs')}>新手教学</button>
         </div>
         <div className="hp-nav-actions">
           <button className="hp-btn-outline" onClick={() => navigate('/login')}>登录</button>
@@ -164,17 +164,16 @@ function HomePage() {
         <p className="hp-section-desc">精选入门教程，从零开始了解 Web3 世界</p>
         <div className="hp-tutorials">
           {tutorials.map((t, i) => (
-            <a
+            <div
               className="hp-tutorial-card"
               key={i}
-              href={t.link}
-              target="_blank"
-              rel="noopener noreferrer"
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate(`/docs/${t.docId || ''}`)}
             >
               <h3>{t.title}</h3>
               <p>{t.desc}</p>
               <span className="hp-tutorial-link">查看教程 →</span>
-            </a>
+            </div>
           ))}
         </div>
         <div className="hp-tutorials-note">

@@ -242,6 +242,7 @@ https://www.binance.com/zh-CN/support/faq/%E5%85%85%E5%80%BC%E4%B8%8E%E6%8F%90%E
     title: "网格机器人",
     category: "交易所教程",
     content: `
+    
 # 网格机器人
 
 ![网格机器人1](/images/grid-bot-1.jpg)
@@ -278,46 +279,142 @@ function DocsContent({ doc }) {
   const html = marked.parse(doc.content, { breaks: true, gfm: true });
 
   const handleClick = (e) => {
-    if (e.target.tagName !== 'IMG') return;
+    if (e.target.tagName !== "IMG") return;
 
     const container = e.currentTarget;
-    const images = Array.from(container.querySelectorAll('img'));
+    const images = Array.from(container.querySelectorAll("img"));
     const index = images.indexOf(e.target);
     if (index === -1) return;
 
     const showImage = (i) => {
-      const imgEl = document.getElementById('docs-lightbox-img');
-      const counter = document.getElementById('docs-lightbox-counter');
+      const imgEl = document.getElementById("docs-lightbox-img");
+      const counter = document.getElementById("docs-lightbox-counter");
       if (imgEl) imgEl.src = images[i].src;
-      if (counter) counter.textContent = images.length > 1 ? `${i + 1} / ${images.length}` : '';
-      document.getElementById('docs-lightbox-prev').style.display = i > 0 ? 'block' : 'none';
-      document.getElementById('docs-lightbox-next').style.display = i < images.length - 1 ? 'block' : 'none';
-      document.getElementById('docs-lightbox-img').dataset.index = i;
+      if (counter)
+        counter.textContent =
+          images.length > 1 ? `${i + 1} / ${images.length}` : "";
+      document.getElementById("docs-lightbox-prev").style.display =
+        i > 0 ? "block" : "none";
+      document.getElementById("docs-lightbox-next").style.display =
+        i < images.length - 1 ? "block" : "none";
+      document.getElementById("docs-lightbox-img").dataset.index = i;
     };
 
     Swal.fire({
       html: `
-        <div style="position:relative;display:flex;align-items:center;justify-content:center;height:80vh">
-          <button id="docs-lightbox-prev" style="position:absolute;left:0;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index > 0 ? 'block' : 'none'}">‹</button>
-          <img id="docs-lightbox-img" src="${images[index].src}" data-index="${index}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px" />
-          <button id="docs-lightbox-next" style="position:absolute;right:0;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index < images.length - 1 ? 'block' : 'none'}">›</button>
-          <div id="docs-lightbox-counter" style="position:absolute;bottom:-30px;color:rgba(255,255,255,0.5);font-size:0.85rem">${images.length > 1 ? `${index + 1} / ${images.length}` : ''}</div>
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;height:80vh;overflow:hidden">
+          <button id="docs-lightbox-prev" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:2;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index > 0 ? "block" : "none"}">‹</button>
+          <div id="docs-lightbox-wrap" style="overflow:hidden;max-width:100%;max-height:100%;display:flex;align-items:center;justify-content:center;position:relative;width:100%;height:100%">
+            <img id="docs-lightbox-img" src="${images[index].src}" data-index="${index}" data-scale="1" draggable="false" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;transition:none;cursor:grab;user-select:none" />
+          </div>
+          <button id="docs-lightbox-next" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:2;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index < images.length - 1 ? "block" : "none"}">›</button>
+          <div id="docs-lightbox-counter" style="position:absolute;bottom:-30px;color:rgba(255,255,255,0.5);font-size:0.85rem">${images.length > 1 ? `${index + 1} / ${images.length}` : ""}</div>
+          <div id="docs-lightbox-hint" style="position:absolute;top:-25px;color:rgba(255,255,255,0.3);font-size:0.75rem">滚轮缩放 · 拖拽移动 · 双击还原</div>
         </div>
       `,
-      background: 'transparent',
-      backdrop: 'rgba(0,0,0,0.85)',
+      background: "transparent",
+      backdrop: "rgba(0,0,0,0.85)",
       showCloseButton: true,
       showConfirmButton: false,
-      width: '90%',
+      width: "90%",
       didOpen: () => {
-        document.getElementById('docs-lightbox-prev').onclick = () => {
-          const cur = parseInt(document.getElementById('docs-lightbox-img').dataset.index);
-          if (cur > 0) showImage(cur - 1);
+        const img = document.getElementById("docs-lightbox-img");
+        let scale = 1;
+        let tx = 0,
+          ty = 0;
+        let dragging = false,
+          startX,
+          startY;
+
+        const applyTransform = () => {
+          img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
         };
-        document.getElementById('docs-lightbox-next').onclick = () => {
-          const cur = parseInt(document.getElementById('docs-lightbox-img').dataset.index);
-          if (cur < images.length - 1) showImage(cur + 1);
+
+        const resetView = () => {
+          scale = 1;
+          tx = 0;
+          ty = 0;
+          img.style.maxWidth = "100%";
+          img.style.maxHeight = "100%";
+          applyTransform();
         };
+
+        // 滚轮缩放
+        img.addEventListener("wheel", (e) => {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? 0.9 : 1.1;
+          scale = Math.max(0.3, Math.min(5, scale * delta));
+          applyTransform();
+        });
+
+        // 拖拽
+        img.addEventListener("mousedown", (e) => {
+          if (scale <= 1) return;
+          dragging = true;
+          startX = e.clientX - tx;
+          startY = e.clientY - ty;
+          img.style.cursor = "grabbing";
+        });
+        document.addEventListener("mousemove", (e) => {
+          if (!dragging) return;
+          tx = e.clientX - startX;
+          ty = e.clientY - startY;
+          applyTransform();
+        });
+        document.addEventListener("mouseup", () => {
+          dragging = false;
+          img.style.cursor = scale > 1 ? "grab" : "zoom-in";
+        });
+
+        // 双击还原
+        img.addEventListener("dblclick", () => resetView());
+
+        // 翻页时重置
+        const origShowImage = showImage;
+        const showImageWithReset = (i) => {
+          origShowImage(i);
+          scale = 1;
+          tx = 0;
+          ty = 0;
+          applyTransform();
+        };
+
+        document.getElementById("docs-lightbox-prev").onclick = () => {
+          const cur = parseInt(img.dataset.index);
+          if (cur > 0) showImageWithReset(cur - 1);
+        };
+        document.getElementById("docs-lightbox-next").onclick = () => {
+          const cur = parseInt(img.dataset.index);
+          if (cur < images.length - 1) showImageWithReset(cur + 1);
+        };
+
+        // 触摸缩放支持
+        let lastTouchDist = 0;
+        img.addEventListener("touchstart", (e) => {
+          if (e.touches.length === 2) {
+            lastTouchDist = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY,
+            );
+          }
+        });
+        img.addEventListener("touchmove", (e) => {
+          if (e.touches.length === 2) {
+            e.preventDefault();
+            const dist = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY,
+            );
+            if (lastTouchDist > 0) {
+              scale = Math.max(
+                0.3,
+                Math.min(5, scale * (dist / lastTouchDist)),
+              );
+              applyTransform();
+            }
+            lastTouchDist = dist;
+          }
+        });
       },
     });
   };
@@ -634,6 +731,13 @@ function DocsPage() {
           }
           .docs-mobile-menu-btn {
             display: flex !important;
+          }
+          .docs-scroll-area {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .docs-scroll-area::-webkit-scrollbar {
+            display: none;
           }
         }
       `}</style>

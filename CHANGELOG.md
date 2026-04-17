@@ -286,3 +286,60 @@
 未投入生产前暂不紧急，后续按开发计划逐步修复。
 
 ---
+
+## [2026-04-18] Phase 2.7 — 文档中心
+
+**目标**：在网站内嵌文档系统，公开访问，无需登录，国内可访问
+
+**改动文件**：
+
+| 文件 | 操作 | 说明 |
+|---|---|---|
+| `src/pages/DocsPage.js` | 新建 | 文档中心页面：左侧目录 + 右侧内容，7 篇文档 |
+| `src/App.js` | 修改 | 新增 `/docs` 和 `/docs/:docId` 路由（公开访问） |
+| `src/pages/HomePage.js` | 修改 | 新手教学跳转改为文档中心，顶部导航栏调整 |
+
+**文档内容**：
+1. 如何下载币安 App
+2. KYC 实名认证
+3. C2C 交易教程
+4. 充值与提现
+5. 现货交易实操
+6. 合约交易基础概念
+7. 网格机器人
+
+---
+
+## [2026-04-18] 文档中心优化 — 图片 + 灯箱 + 滚动修复
+
+**目标**：支持文档内图片展示，点击放大，修复滚动条问题
+
+**改动文件**：
+
+| 文件 | 操作 | 说明 |
+|---|---|---|
+| `public/images/` | 新增 | 16 张文档配图（jpg/png） |
+| `src/pages/DocsPage.js` | 修改 | 图片灯箱（滚轮缩放、拖拽移动、双击还原、触摸缩放、上下翻页） |
+| `src/pages/DocsPage.js` | 修改 | 外层容器 height:100vh + overflow:hidden 防止双滚动条 |
+| `src/pages/DocsPage.js` | 修改 | overflowY: auto → scroll + scrollbar-width:none 防止闪动 |
+| `src/pages/DocsPage.js` | 修改 | 移动端双指缩放 + 拖拽支持 |
+
+---
+
+## [2026-04-18] Cloudflare Pages 部署
+
+**目标**：部署到 Cloudflare Pages，支持 GitHub 自动部署
+
+**改动文件**：
+
+| 文件 | 操作 | 说明 |
+|---|---|---|
+| `public/_redirects` | 新建 | SPA 路由支持：`/* /index.html 200` |
+| `README.md` | 更新 | 反映当前项目状态和部署配置 |
+
+**部署配置**：
+- 构建命令：`CI=false npm run build`
+- 输出目录：`build`
+- 环境变量：`REACT_APP_SUPABASE_URL`、`REACT_APP_SUPABASE_ANON_KEY`
+
+---

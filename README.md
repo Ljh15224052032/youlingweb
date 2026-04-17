@@ -50,6 +50,8 @@ REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
 | URL | 页面 | 说明 |
 |---|---|---|
 | `/` | 落地页 | 官网首页，无需登录 |
+| `/docs` | 文档中心 | 交易所教程等，无需登录 |
+| `/docs/:docId` | 文档详情 | 具体文档页面 |
 | `/login` | 登录页 | 邮箱密码登录 |
 | `/register` | 注册页 | 邮箱注册 + 邀请码 |
 | `/forgot` | 找回密码 | 邮箱确认后重置密码 |

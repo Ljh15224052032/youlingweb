@@ -10,29 +10,11 @@ import { safeMarkdown, escapeHtml } from '../utils/sanitize';
 function Airdrop() {
   const [airdrops, setAirdrops] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isVerified, setIsVerified] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const { userInfo } = useUserStore();
-
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      if (!userInfo.id) return;
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('is_verified')
-          .eq('id', userInfo.id)
-          .single();
-        if (error) throw error;
-        setIsVerified(data.is_verified);
-      } catch {
-        setIsVerified(false);
-      }
-    };
-    checkUserStatus();
-  }, [userInfo.id]);
+  const isVerified = userInfo.is_verified;
 
   useEffect(() => {
     const fetchAirdrops = async () => {

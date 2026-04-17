@@ -13,33 +13,9 @@ function NewbieGuide() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [isVerified, setIsVerified] = useState(false);
-  const [verificationLoading, setVerificationLoading] = useState(true);
 
   const { userInfo } = useUserStore();
-
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      if (!userInfo.id) {
-        setVerificationLoading(false);
-        return;
-      }
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('is_verified')
-          .eq('id', userInfo.id)
-          .single();
-        if (error) throw error;
-        setIsVerified(data.is_verified);
-      } catch {
-        setIsVerified(false);
-      } finally {
-        setVerificationLoading(false);
-      }
-    };
-    checkUserStatus();
-  }, [userInfo.id]);
+  const isVerified = userInfo.is_verified;
 
   useEffect(() => {
     const fetchGuides = async () => {
@@ -114,14 +90,6 @@ function NewbieGuide() {
     };
     return colors[category] || '#bfa14a';
   };
-
-  if (verificationLoading) {
-    return (
-      <div className="component-container">
-        <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>验证用户状态中...</div>
-      </div>
-    );
-  }
 
   if (!isVerified) {
     return (

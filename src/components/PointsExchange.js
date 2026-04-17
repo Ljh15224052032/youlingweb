@@ -15,31 +15,7 @@ function PointsExchange() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userApplications, setUserApplications] = useState({});
-  const [isVerified, setIsVerified] = useState(false);
-  const [verificationLoading, setVerificationLoading] = useState(true);
-
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      if (!userInfo.id) {
-        setVerificationLoading(false);
-        return;
-      }
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('is_verified')
-          .eq('id', userInfo.id)
-          .single();
-        if (error) throw error;
-        setIsVerified(data.is_verified);
-      } catch {
-        setIsVerified(false);
-      } finally {
-        setVerificationLoading(false);
-      }
-    };
-    checkUserStatus();
-  }, [userInfo.id]);
+  const isVerified = userInfo.is_verified;
 
   const fetchUserApplications = async () => {
     if (!userInfo.id) return;
@@ -191,14 +167,6 @@ function PointsExchange() {
     { icon: '👥', title: '邀请好友', desc: '好友通过你的邀请码注册', points: '+30/人' },
     { icon: '📖', title: '每日学习', desc: '每日阅读新手指南或合约教学', points: '+5/天' },
   ];
-
-  if (verificationLoading) {
-    return (
-      <div className="component-container">
-        <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>验证用户状态中...</div>
-      </div>
-    );
-  }
 
   if (!isVerified) {
     return (

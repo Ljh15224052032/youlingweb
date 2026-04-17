@@ -10,54 +10,10 @@ function ContractTutorial() {
   const [tutorials, setTutorials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isVerified, setIsVerified] = useState(false);
-  const [verificationLoading, setVerificationLoading] = useState(true);
-  const [userType, setUserType] = useState('');
-  const [userTypeLoading, setUserTypeLoading] = useState(true);
-  
-  // 从userStore获取用户信息
+
   const { userInfo } = useUserStore();
-  
-  // 检查用户认证状态和用户类型
-  const checkUserStatus = async () => {
-    if (!userInfo.id) {
-      setVerificationLoading(false);
-      setUserTypeLoading(false);
-      return;
-    }
-    
-    try {
-      setVerificationLoading(true);
-      setUserTypeLoading(true);
-      
-      const { data, error } = await supabase
-        .from('users')
-        .select('is_verified, user_type')
-        .eq('id', userInfo.id)
-        .single();
-      
-      if (error) throw error;
-      
-      const verified = data.is_verified;
-      const type = data.user_type || '普通用户';
-      
-      setIsVerified(verified);
-      setUserType(type);
-    } catch (error) {
-      console.error('检查用户状态失败:', error);
-      setIsVerified(false);
-      setUserType('普通用户');
-    } finally {
-      setVerificationLoading(false);
-      setUserTypeLoading(false);
-    }
-  };
-  
-  // 每次组件渲染时检查用户状态
-  useEffect(() => {
-    checkUserStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userInfo.id]);
+  const isVerified = userInfo.is_verified;
+  const userType = userInfo.user_type || '普通用户';
 
   // 从Supabase获取合约教学数据
   useEffect(() => {
@@ -162,11 +118,7 @@ function ContractTutorial() {
 
   return (
     <SimpleBar className="component-container tutorial-scroll">
-      {verificationLoading || userTypeLoading ? (
-        <div className="loading-container">
-          <p>验证用户状态中...</p>
-        </div>
-      ) : !isVerified ? (
+      {!isVerified ? (
         <div className="verification-required">
           <h2>需要账号验证</h2>
           <p>请先完成账号验证（绑定UID）后后再访问此页面</p>

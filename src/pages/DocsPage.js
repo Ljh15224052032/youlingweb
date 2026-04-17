@@ -388,31 +388,51 @@ function DocsContent({ doc }) {
           if (cur < images.length - 1) showImageWithReset(cur + 1);
         };
 
-        // 触摸缩放支持
+        // 触摸缩放 + 双指拖拽支持
         let lastTouchDist = 0;
+        let touchDragging = false;
+        let touchStartX = 0, touchStartY = 0;
         img.addEventListener("touchstart", (e) => {
           if (e.touches.length === 2) {
+            e.preventDefault();
+            touchDragging = true;
             lastTouchDist = Math.hypot(
               e.touches[0].clientX - e.touches[1].clientX,
               e.touches[0].clientY - e.touches[1].clientY,
             );
+            touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - tx;
+            touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - ty;
+          } else if (e.touches.length === 1 && scale > 1) {
+            touchDragging = true;
+            touchStartX = e.touches[0].clientX - tx;
+            touchStartY = e.touches[0].clientY - ty;
           }
-        });
+        }, { passive: false });
         img.addEventListener("touchmove", (e) => {
+          if (!touchDragging) return;
+          e.preventDefault();
           if (e.touches.length === 2) {
-            e.preventDefault();
             const dist = Math.hypot(
               e.touches[0].clientX - e.touches[1].clientX,
               e.touches[0].clientY - e.touches[1].clientY,
             );
             if (lastTouchDist > 0) {
-              scale = Math.max(
-                0.3,
-                Math.min(5, scale * (dist / lastTouchDist)),
-              );
-              applyTransform();
+              scale = Math.max(0.3, Math.min(5, scale * (dist / lastTouchDist)));
             }
             lastTouchDist = dist;
+            tx = (e.touches[0].clientX + e.touches[1].clientX) / 2 - touchStartX;
+            ty = (e.touches[0].clientY + e.touches[1].clientY) / 2 - touchStartY;
+            applyTransform();
+          } else if (e.touches.length === 1 && scale > 1) {
+            tx = e.touches[0].clientX - touchStartX;
+            ty = e.touches[0].clientY - touchStartY;
+            applyTransform();
+          }
+        }, { passive: false });
+        img.addEventListener("touchend", (e) => {
+          if (e.touches.length === 0) {
+            touchDragging = false;
+            lastTouchDist = 0;
           }
         });
       },
@@ -435,7 +455,8 @@ function DocsPage() {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100vh",
+        overflow: "hidden",
         background: "#181a20",
         color: "#fff",
         display: "flex",
@@ -611,7 +632,7 @@ function DocsPage() {
 
         {/* 右侧内容 */}
         <main style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ height: "calc(100vh - 56px)", overflowY: "auto" }}>
+          <div className="docs-content-scroll" style={{ height: "calc(100vh - 56px)", overflowY: "scroll" }}>
             <div
               style={{
                 maxWidth: "800px",
@@ -720,6 +741,14 @@ function DocsPage() {
         .docs-content th {
           background: rgba(191,161,74,0.1);
           color: #ffd700;
+        }
+
+        .docs-content-scroll {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .docs-content-scroll::-webkit-scrollbar {
+          display: none;
         }
 
         @media (max-width: 768px) {

@@ -31,6 +31,8 @@
   color: #ffd700;
   letter-spacing: 3px;
   font-family: "Cinzel", serif;
+  cursor: default;
+  user-select: none;
 }
 .hp-nav-links {
   display: flex;
@@ -294,6 +296,78 @@
   border-top: 1px solid rgba(191, 161, 74, 0.1);
   color: rgba(255, 255, 255, 0.25);
   font-size: 0.8rem;
+}
+
+/* 社交图标 */
+.hp-social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-bottom: 1rem;
+}
+.hp-social-icon {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.hp-social-icon:hover {
+  transform: translateY(-4px);
+  color: #fff;
+}
+.hp-social-icon.wechat:hover {
+  background: #07C160;
+}
+.hp-social-icon.official-account:hover {
+  background: #bfa14a;
+}
+.hp-social-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: inherit;
+  width: 100%;
+  height: 100%;
+}
+.hp-social-link:hover {
+  color: #fff;
+}
+.hp-social-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  background: rgba(30, 30, 32, 0.95);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  pointer-events: none;
+}
+.hp-social-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(30, 30, 32, 0.95);
+}
+.hp-social-icon:hover .hp-social-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
 }
 
 /* ========== 响应式 ========== */

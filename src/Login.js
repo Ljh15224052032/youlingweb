@@ -99,8 +99,8 @@ function Login() {
         />
         <button type="submit" disabled={submitting}>{submitting ? '登录中...' : '登录'}</button>
         <div className="login-actions">
-          <button type="button" className="action-btn" style={{width:'20%', background:'none',boxShadow:'none'}} onClick={() => navigate('/register')}>注册</button>
-          <button type="button" className="action-btn" style={{width:'20%', background:'none',boxShadow:'none'}} onClick={() => navigate('/forgot')}>忘记密码</button>
+          <button type="button" className="action-btn" style={{background:'none',boxShadow:'none',whiteSpace:'nowrap'}} onClick={() => navigate('/register')}>注册</button>
+          <button type="button" className="action-btn" style={{background:'none',boxShadow:'none',whiteSpace:'nowrap'}} onClick={() => navigate('/forgot')}>忘记密码</button>
         </div>
       </form>
     </div>

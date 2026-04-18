@@ -204,7 +204,8 @@
   border-top: 1px solid rgba(191, 161, 74, 0.15);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 0.8rem;
 }
 .dash-drawer-profile-btn {
   background: none;
@@ -218,17 +219,17 @@
 .dash-drawer-profile-btn:hover {
   background: rgba(191, 161, 74, 0.1);
 }
-.dash-drawer-logout-btn {
-  background: none;
-  border: 1px solid rgba(255, 107, 107, 0.3);
-  color: #ff6b6b;
-  padding: 0.3rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
+.dash-drawer-avatar {
+  font-size: 1.2rem;
+  line-height: 1;
 }
-.dash-drawer-logout-btn:hover {
-  background: rgba(255, 107, 107, 0.1);
+.dash-drawer-username {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ========== 内容区 ========== */
@@ -264,7 +265,7 @@
   .dash-hamburger {
     display: flex;
   }
-  .dash-header-right .dash-user-name {
+  .dash-user-btn {
     display: none;
   }
   .dash-content {

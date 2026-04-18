@@ -223,6 +223,7 @@ function Airdrop() {
             ))}
             <input
               type="text"
+              className="airdrop-search"
               placeholder="搜索活动..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
@@ -306,6 +307,14 @@ function Airdrop() {
           )}
         </div>
       </SimpleBar>
+      <style>{`
+        @media (max-width: 768px) {
+          .airdrop-search {
+            margin-left: 0 !important;
+            width: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 }

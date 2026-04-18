@@ -83,7 +83,7 @@ function Dashboard() {
               <path d="M4 6h16M4 12h16M4 18h16" stroke="#ffd700" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </button>
-          <div className="dash-logo" onClick={() => navigate('/dashboard/airdrop')}><LogoIcon size={28} /> GHOST</div>
+          <div className="dash-logo" onClick={() => navigate('/')}><LogoIcon size={28} /> GHOST</div>
         </div>
         <nav className="dash-nav">
           {sections.map(sec => (
@@ -149,9 +149,8 @@ function Dashboard() {
           ))}
         </nav>
         <div className="dash-drawer-footer">
-          <span className="dash-user-name">{displayUsername}</span>
+          {displayUsername && <><span className="dash-drawer-avatar">👤</span><span className="dash-drawer-username">{displayUsername}</span></>}
           <button className="dash-drawer-profile-btn" onClick={() => { navigate('/dashboard/profile'); setDrawerOpen(false); }}>个人中心</button>
-          <button className="dash-drawer-logout-btn" onClick={handleLogout}>退出</button>
         </div>
       </aside>
 

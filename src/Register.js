@@ -4,9 +4,11 @@ import './Login.css';
 import bcrypt from 'bcryptjs';
 import { supabase } from './services/supabaseClient';
 import Swal from 'sweetalert2';
+import { useLang } from './i18n/context';
 
 function Register() {
   const navigate = useNavigate();
+  const { t } = useLang();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -19,7 +21,7 @@ function Register() {
 
   const handleEmailBlur = () => {
     if (email && !validateEmail(email)) {
-      setEmailError('请输入有效的邮箱地址');
+      setEmailError(t('register.validEmail'));
     } else {
       setEmailError('');
     }
@@ -37,19 +39,19 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password || !confirm) {
-      Swal.fire({ title: '请填写所有信息', icon: 'warning', confirmButtonText: '确定' });
+      Swal.fire({ title: t('register.fillAll'), icon: 'warning', confirmButtonText: t('register.confirm') });
       return;
     }
     if (email && !validateEmail(email)) {
-      Swal.fire({ title: '邮箱格式不正确', icon: 'warning', confirmButtonText: '确定' });
+      Swal.fire({ title: t('register.invalidEmail'), icon: 'warning', confirmButtonText: t('register.confirm') });
       return;
     }
     if (password.length < 8) {
-      Swal.fire({ title: '密码长度至少需要8位', icon: 'warning', confirmButtonText: '确定' });
+      Swal.fire({ title: t('register.passwordTooShort'), icon: 'warning', confirmButtonText: t('register.confirm') });
       return;
     }
     if (password !== confirm) {
-      Swal.fire({ title: '两次密码不一致', icon: 'warning', confirmButtonText: '确定' });
+      Swal.fire({ title: t('register.passwordMismatch'), icon: 'warning', confirmButtonText: t('register.confirm') });
       return;
     }
 
@@ -65,9 +67,9 @@ function Register() {
       if (existErr) throw existErr;
       if (Array.isArray(existedUsers) && existedUsers.length > 0) {
         Swal.fire({
-          icon: 'warning', title: '该邮箱已注册',
+          icon: 'warning', title: t('register.emailExists'),
           background: '#1e222d', color: '#d1d4dc',
-          confirmButtonColor: '#bfa14a', confirmButtonText: '确定',
+          confirmButtonColor: '#bfa14a', confirmButtonText: t('register.confirm'),
         });
         return;
       }
@@ -88,18 +90,18 @@ function Register() {
       if (insertErr) throw insertErr;
 
       Swal.fire({
-        icon: 'success', title: '注册成功',
-        text: '请使用邮箱和密码登录',
+        icon: 'success', title: t('register.success'),
+        text: t('register.successMsg'),
         background: '#1e222d', color: '#d1d4dc',
-        confirmButtonColor: '#bfa14a', confirmButtonText: '去登录',
+        confirmButtonColor: '#bfa14a', confirmButtonText: t('register.goToLogin'),
       }).then(() => navigate('/login'));
     } catch (err) {
       console.error('注册失败：', err);
       Swal.fire({
-        icon: 'error', title: '注册失败',
-        text: err?.message || '请稍后重试',
+        icon: 'error', title: t('register.failed'),
+        text: err?.message || t('register.retryLater'),
         background: '#1e222d', color: '#d1d4dc',
-        confirmButtonColor: '#ef5350', confirmButtonText: '确定',
+        confirmButtonColor: '#ef5350', confirmButtonText: t('register.confirm'),
       });
     } finally {
       setSubmitting(false);
@@ -110,15 +112,15 @@ function Register() {
     <div className="login-form">
       <div className="ghost-logo">GHOST <svg width="36" height="36" viewBox="0 0 220 220" fill="none" style={{verticalAlign:'middle'}}><path fillRule="evenodd" clipRule="evenodd" d="M75 109.5L13 19H71L108.5 73.5L146 19H197L134 109.5V187H169.5L202.5 166.5V206.5H75V109.5ZM101.5 82.5L90.5 99.5V194.5L81 199.5L79.5 99.5L31 28.5H66.5L101.5 82.5Z" fill="url(#yl-grad)"/><defs><linearGradient id="yl-grad" x1="202" y1="206" x2="108" y2="17" gradientUnits="userSpaceOnUse"><stop stopColor="white"/><stop offset="1" stopColor="#FFC107"/></linearGradient></defs></svg></div>
       <form className="glass-card" onSubmit={handleSubmit}>
-        <h2 className="login-title">注册账号</h2>
-        <input type="text" placeholder="邮箱" value={email} onChange={e => setEmail(e.target.value)} onBlur={handleEmailBlur} className={emailError ? 'input-error' : ''} />
+        <h2 className="login-title">{t('register.title')}</h2>
+        <input type="text" placeholder={t('register.emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} onBlur={handleEmailBlur} className={emailError ? 'input-error' : ''} />
         {emailError && <div className="input-error-text">{emailError}</div>}
-        <input type="password" placeholder="密码" value={password} onChange={e => setPassword(e.target.value)} />
-        <input type="password" placeholder="确认密码" value={confirm} onChange={e => setConfirm(e.target.value)} />
-        <input type="text" placeholder="邀请码（选填）" value={inviteCode} onChange={e => setInviteCode(e.target.value)} />
-        <button type="submit" disabled={submitting}>{submitting ? '注册中...' : '注册'}</button>
+        <input type="password" placeholder={t('register.passwordPlaceholder')} value={password} onChange={e => setPassword(e.target.value)} />
+        <input type="password" placeholder={t('register.confirmPasswordPlaceholder')} value={confirm} onChange={e => setConfirm(e.target.value)} />
+        <input type="text" placeholder={t('register.inviteCodePlaceholder')} value={inviteCode} onChange={e => setInviteCode(e.target.value)} />
+        <button type="submit" disabled={submitting}>{submitting ? t('register.submitting') : t('register.submit')}</button>
         <div className="login-actions">
-          <button type="button" className="action-btn" style={{background:'none',boxShadow:'none',whiteSpace:'nowrap'}} onClick={() => navigate('/login')}>返回登录</button>
+          <button type="button" className="action-btn" style={{background:'none',boxShadow:'none',whiteSpace:'nowrap'}} onClick={() => navigate('/login')}>{t('register.backToLogin')}</button>
         </div>
       </form>
     </div>

@@ -3,6 +3,7 @@ import './Components.css';
 import { supabase } from '../services/supabaseClient';
 import useUserStore from '../store/userStore';
 import { safeMarkdown, escapeHtml } from '../utils/sanitize';
+import { useLang } from '../i18n/context';
 
 function NewbieGuide() {
   const [guides, setGuides] = useState([]);
@@ -14,6 +15,7 @@ function NewbieGuide() {
 
   const { userInfo } = useUserStore();
   const isVerified = userInfo.is_verified;
+  const { t } = useLang();
 
   useEffect(() => {
     const fetchGuides = async () => {
@@ -50,8 +52,8 @@ function NewbieGuide() {
     return (
       <div className="component-container">
         <div className="verification-required">
-          <h2>需要账号验证</h2>
-          <p>请先完成账号验证（绑定 UID）后再访问此页面</p>
+          <h2>{t('newbie.needVerifyTitle')}</h2>
+          <p>{t('newbie.needVerifyDesc')}</p>
         </div>
       </div>
     );
@@ -79,7 +81,7 @@ function NewbieGuide() {
         >
           {categories.map(cat => (
             <option key={cat} value={cat} style={{ background: '#1a1a1a', color: '#eee' }}>
-              {cat === 'all' ? '全部分类' : cat}
+              {cat === 'all' ? t('newbie.allCategories') : cat}
             </option>
           ))}
         </select>
@@ -89,17 +91,17 @@ function NewbieGuide() {
       <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none' }}
         className="docs-content-scroll">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>加载中...</div>
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>{t('newbie.loading')}</div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '2rem', color: '#ff6b6b', fontSize: '0.85rem' }}>
-            <p>加载失败</p>
+            <p>{t('newbie.loadFailed')}</p>
             <button
               onClick={() => window.location.reload()}
               style={{ marginTop: '0.5rem', padding: '0.3rem 0.8rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', background: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.8rem' }}
-            >重试</button>
+            >{t('newbie.retry')}</button>
           </div>
         ) : filteredGuides.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>暂无指南</div>
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>{t('newbie.noGuides')}</div>
         ) : (
           filteredGuides.map(guide => (
             <div
@@ -198,14 +200,14 @@ function NewbieGuide() {
             </svg>
           </button>
           <span style={{ color: '#ffd700', fontSize: '0.9rem', fontWeight: 600 }}>
-            {selectedGuide ? selectedGuide.title : '新手知识'}
+            {selectedGuide ? selectedGuide.title : t('newbie.defaultTitle')}
           </span>
         </div>
 
         {!selectedGuide ? (
           <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'rgba(255,255,255,0.3)' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>📖</div>
-            <p>选择左侧指南开始阅读</p>
+            <p>{t('newbie.selectGuide')}</p>
           </div>
         ) : (
           <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>

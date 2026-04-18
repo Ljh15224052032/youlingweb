@@ -8,6 +8,8 @@ import NewbieGuide from './components/NewbieGuide';
 import ContractTutorial from './components/ContractTutorial';
 import UserProfile from './components/UserProfile';
 import PointsExchange from './components/PointsExchange';
+import LangToggle from './components/LangToggle';
+import { LanguageProvider, useLang } from './i18n/context';
 import useUserStore from './store/userStore';
 import './App.css';
 
@@ -52,6 +54,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const { userInfo, logout } = useUserStore();
+  const { t } = useLang();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -88,7 +91,7 @@ function Dashboard() {
               onClick={() => navigate(`/dashboard/${sec.key}`)}
             >
               <span className="dash-nav-icon">{sec.icon}</span>
-              <span>{sec.label}</span>
+              <span>{t('nav.' + sec.key)}</span>
             </button>
           ))}
         </nav>
@@ -110,10 +113,10 @@ function Dashboard() {
           {userMenuOpen && (
             <div className="dash-user-menu">
               <div className="dash-user-menu-item" onClick={() => { navigate('/dashboard/profile'); setUserMenuOpen(false); }}>
-                个人中心
+                {t('nav.profile')}
               </div>
               <div className="dash-user-menu-item dash-user-menu-logout" onClick={handleLogout}>
-                退出登录
+                {t('nav.logout')}
               </div>
             </div>
           )}
@@ -139,13 +142,13 @@ function Dashboard() {
               onClick={() => { navigate(`/dashboard/${sec.key}`); setDrawerOpen(false); }}
             >
               <span className="dash-nav-icon">{sec.icon}</span>
-              <span>{sec.label}</span>
+              <span>{t('nav.' + sec.key)}</span>
             </div>
           ))}
         </nav>
         <div className="dash-drawer-footer">
           {displayUsername && <><span className="dash-drawer-avatar">👤</span><span className="dash-drawer-username">{displayUsername}</span></>}
-          <button className="dash-drawer-profile-btn" onClick={() => { navigate('/dashboard/profile'); setDrawerOpen(false); }}>个人中心</button>
+          <button className="dash-drawer-profile-btn" onClick={() => { navigate('/dashboard/profile'); setDrawerOpen(false); }}>{t('nav.profile')}</button>
         </div>
       </aside>
 
@@ -153,7 +156,7 @@ function Dashboard() {
       <main className="dash-main">
         <div className="dash-content-header">
           <span className="dash-content-icon">{current ? icons[current.key] : icons.profile}</span>
-          <h1 className="dash-content-title">{current ? current.label : '个人中心'}</h1>
+          <h1 className="dash-content-title">{current ? t('nav.' + current.key) : t('nav.profile')}</h1>
         </div>
         <section className="dash-content">
           <CurrentComponent />
@@ -163,7 +166,7 @@ function Dashboard() {
   );
 }
 
-function App() {
+function AppInner() {
   const { isLoggedIn, userInfo } = useUserStore();
 
   useEffect(() => {
@@ -176,17 +179,28 @@ function App() {
   }, [isLoggedIn, userInfo]);
 
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/docs" element={<DocsPage />} />
-      <Route path="/docs/:docId" element={<DocsPage />} />
-      <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="login" />} />
-      <Route path="/register" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="register" />} />
-      <Route path="/forgot" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="forgot" />} />
-      <Route path="/dashboard" element={isLoggedIn ? <Navigate to="/dashboard/airdrop" /> : <Navigate to="/login" />} />
-      <Route path="/dashboard/:section" element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />} />
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <>
+      <LangToggle />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/docs" element={<DocsPage />} />
+        <Route path="/docs/:docId" element={<DocsPage />} />
+        <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="login" />} />
+        <Route path="/register" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="register" />} />
+        <Route path="/forgot" element={isLoggedIn ? <Navigate to="/dashboard" /> : <AuthContainer page="forgot" />} />
+        <Route path="/dashboard" element={isLoggedIn ? <Navigate to="/dashboard/airdrop" /> : <Navigate to="/login" />} />
+        <Route path="/dashboard/:section" element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <LanguageProvider>
+      <AppInner />
+    </LanguageProvider>
   );
 }
 

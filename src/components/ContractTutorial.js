@@ -5,6 +5,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import { supabase } from '../services/supabaseClient';
 import useUserStore from '../store/userStore';
 import { safeMarkdown } from '../utils/sanitize';
+import { useLang } from '../i18n/context';
 
 function ContractTutorial() {
   const [tutorials, setTutorials] = useState([]);
@@ -14,21 +15,22 @@ function ContractTutorial() {
   const { userInfo } = useUserStore();
   const isVerified = userInfo.is_verified;
   const userType = userInfo.user_type || '普通用户';
+  const { t } = useLang();
 
   // 从Supabase获取合约教学数据
   useEffect(() => {
     const fetchTutorials = async () => {
       try {
         setLoading(true);
-        
+
         // 获取合约教学数据
         const { data, error } = await supabase
           .from('contract_tutorials')
           .select('*')
           .order('created_at', { ascending: false });
-        
+
         if (error) throw error;
-        
+
         // 处理获取到的数据
         const processedTutorials = data.map(tutorial => {
           // 解析标签数据 - 根据提供的SQL格式: "{\"入门\"]}"
@@ -36,7 +38,7 @@ function ContractTutorial() {
           try {
             if (tutorial.tags) {
               let tagsString = tutorial.tags;
-              
+
               // 尝试匹配格式中的标签
               const tagMatch = tagsString.match(/"([^"]+)"/);
               if (tagMatch && tagMatch[1]) {
@@ -67,18 +69,18 @@ function ContractTutorial() {
 
           // 选择第一个标签作为level，如果没有则默认为"基础"
           const level = tags && tags.length > 0 ? tags[0] : '基础';
-          
+
           // 提取内容前50个字符作为描述
-          const description = tutorial.content 
+          const description = tutorial.content
             ? tutorial.content.replace(/[!#*[\]()`]/g, '').substring(0, 50) + '...'
-            : '暂无描述';
-          
+            : t('contract.noDesc');
+
           return {
             id: tutorial.id,
-            title: tutorial.title || '无标题教程',
+            title: tutorial.title || t('contract.defaultTitle'),
             level: level,
             description: description,
-            content: tutorial.content || '暂无内容',
+            content: tutorial.content || t('contract.noContent'),
             created_at: tutorial.created_at
           };
         });
@@ -87,24 +89,24 @@ function ContractTutorial() {
       } catch (err) {
         console.error('获取合约教学数据失败:', err);
         setError(err.message);
-        
+
         // 加载失败时使用默认数据
         setTutorials([
           {
             id: 1,
-            title: 'Solidity 基础语法',
-            level: '入门',
-            description: '学习 Solidity 编程语言的基本语法和数据类型...',
-            content: '内容加载失败，请稍后再试。'
+            title: t('contract.basicSyntax'),
+            level: t('contract.beginner'),
+            description: t('contract.basicSyntaxDesc'),
+            content: t('contract.defaultContent')
           }
         ]);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchTutorials();
-  }, []);
+  }, [t]);
 
   const [expandedTutorial, setExpandedTutorial] = useState(null);
 
@@ -120,28 +122,28 @@ function ContractTutorial() {
     <SimpleBar className="component-container tutorial-scroll">
       {!isVerified ? (
         <div className="verification-required">
-          <h2>需要账号验证</h2>
-          <p>请先完成账号验证（绑定UID）后后再访问此页面</p>
+          <h2>{t('contract.needVerifyTitle')}</h2>
+          <p>{t('contract.needVerifyDesc')}</p>
         </div>
-      ) : userType !== '高级用户' && userType !== '合作机构' && userType !== 'premium' ? (
+      ) : userType !== t('profile.advancedUser') && userType !== '合作机构' && userType !== 'premium' ? (
         <div className="verification-required">
-          <h2>需要高级用户权限</h2>
-          <p>此功能仅对高级用户开放，请升级您的账户等级</p>
-          <p className="debug-info">当前用户类型: {userType}</p>
+          <h2>{t('contract.needPremiumTitle')}</h2>
+          <p>{t('contract.needPremiumDesc')}</p>
+          <p className="debug-info">{t('contract.currentUserType')}{userType}</p>
         </div>
       ) : loading ? (
         <div className="loading-container">
-          <p>正在加载教程内容...</p>
+          <p>{t('contract.loading')}</p>
         </div>
       ) : error ? (
         <div className="error-container">
-          <p>加载失败: {error}</p>
+          <p>{t('contract.loadFailed')}{error}</p>
         </div>
       ) : (
         <div className="tutorial-container">
           {tutorials.map(tutorial => (
             <div key={tutorial.id} className="guide-item-wrapper">
-              <div 
+              <div
                 className={`guide-item ${expandedTutorial?.id === tutorial.id ? 'active' : ''}`}
                 onClick={() => handleTutorialClick(tutorial)}
               >
@@ -150,16 +152,16 @@ function ContractTutorial() {
                   <span className={`level-badge ${tutorial.level}`}>{tutorial.level}</span>
                 </div>
               </div>
-              
+
               {expandedTutorial?.id === tutorial.id && (
                 <div className="guide-detail-expanded">
                   <div className="tutorial-info">
-                    <span className="level">等级：{tutorial.level}</span>
+                    <span className="level">{t('contract.level')}{tutorial.level}</span>
                   </div>
-                  
+
                   <div className="guide-content">
-                    
-                    
+
+
                     <div className="tutorial-detailed-content markdown-content">
                       <div dangerouslySetInnerHTML={{ __html: safeMarkdown(tutorial.content) }} />
                     </div>
@@ -174,4 +176,4 @@ function ContractTutorial() {
   );
 }
 
-export default ContractTutorial; 
+export default ContractTutorial;

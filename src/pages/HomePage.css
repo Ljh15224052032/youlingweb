@@ -1,9 +1,23 @@
 /* ========== 落地页全局 ========== */
 .homepage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #18181a 60%, #2d2d2d 100%);
+  background: linear-gradient(135deg, #0d0d0f 0%, #1a1508 40%, #0d0d0f 100%);
+  background-attachment: fixed;
   color: #fff;
   overflow-x: hidden;
+  position: relative;
+}
+.hp-page-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.hp-page-particles canvas {
+  pointer-events: auto;
 }
 
 /* ========== 导航栏 ========== */
@@ -18,9 +32,10 @@
   justify-content: space-between;
   padding: 0 2.5rem;
   height: 64px;
-  background: rgba(24, 24, 26, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(191, 161, 74, 0.2);
+  background: linear-gradient(90deg, rgba(13, 13, 15, 0.92), rgba(26, 21, 8, 0.92), rgba(13, 13, 15, 0.92));
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(191, 161, 74, 0.3);
+  box-shadow: 0 1px 20px rgba(191, 161, 74, 0.08);
 }
 .hp-nav-logo {
   display: flex;
@@ -97,6 +112,8 @@
 
 /* ========== Hero ========== */
 .hp-hero {
+  position: relative;
+  z-index: 1;
   min-height: 60vh;
   display: flex;
   align-items: center;
@@ -170,14 +187,6 @@
   );
   pointer-events: none;
 }
-.hp-hero-particles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
 .hp-hero-bg-svg {
   position: absolute;
   top: 60%;
@@ -192,6 +201,8 @@
 
 /* ========== 通用 Section ========== */
 .hp-section {
+  position: relative;
+  z-index: 1;
   padding: 5rem 2rem;
   max-width: 1100px;
   margin: 0 auto;
@@ -224,19 +235,18 @@
   margin-top: 2rem;
 }
 .hp-feature-card {
-  background: rgba(24, 24, 26, 0.9);
-  border: 1px solid rgba(191, 161, 74, 0.15);
+  background: rgba(18, 18, 20, 0.9);
+  border: 1px solid rgba(191, 161, 74, 0.4);
   border-radius: 16px;
   padding: 2rem 1.5rem;
   text-align: center;
   transition: all 0.3s;
+  box-shadow: 0 0 15px rgba(191, 161, 74, 0.15), 0 0 60px rgba(191, 161, 74, 0.05), inset 0 1px 0 rgba(255, 215, 0, 0.1);
 }
 .hp-feature-card:hover {
-  border-color: #bfa14a;
+  border-color: rgba(191, 161, 74, 0.7);
   transform: translateY(-4px);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(191, 161, 74, 0.3);
+  box-shadow: 0 0 20px rgba(191, 161, 74, 0.3), 0 0 80px rgba(191, 161, 74, 0.1), inset 0 1px 0 rgba(255, 215, 0, 0.2);
 }
 .hp-feature-icon {
   margin-bottom: 1rem;
@@ -254,39 +264,61 @@
 }
 
 /* ========== 教学卡片 ========== */
-.hp-tutorials {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
+.hp-tutorials-layout {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+.hp-tutorials-cards {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.hp-tutorials-intro {
+  flex: 0 0 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+.hp-tutorials-intro .hp-section-title {
+  text-align: center;
+}
+.hp-tutorials-intro .hp-section-desc {
+  text-align: center;
 }
 .hp-tutorial-card {
   display: flex;
-  flex-direction: column;
-  background: rgba(24, 24, 26, 0.9);
-  border: 1px solid rgba(191, 161, 74, 0.12);
+  flex-direction: row;
+  background: rgba(18, 18, 20, 0.9);
+  border: 1px solid rgba(191, 161, 74, 0.4);
   border-radius: 12px;
   overflow: hidden;
   text-decoration: none;
   color: inherit;
   transition: all 0.3s;
+  box-shadow: 0 0 15px rgba(191, 161, 74, 0.15), 0 0 60px rgba(191, 161, 74, 0.05), inset 0 1px 0 rgba(255, 215, 0, 0.1);
 }
 .hp-tutorial-card:hover {
-  border-color: #bfa14a;
+  border-color: rgba(191, 161, 74, 0.7);
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 20px rgba(191, 161, 74, 0.3), 0 0 80px rgba(191, 161, 74, 0.1), inset 0 1px 0 rgba(255, 215, 0, 0.2);
 }
 .hp-tutorial-cover {
-  width: 100%;
-  height: 140px;
+  width: 160px;
+  min-height: 80px;
+  flex-shrink: 0;
   background-size: cover;
   background-position: center;
   background-color: rgba(191, 161, 74, 0.08);
 }
 .hp-tutorial-info {
-  padding: 1.2rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   flex: 1;
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
 }
 .hp-tutorial-tag {
   display: inline-block;
@@ -296,29 +328,33 @@
   font-weight: 600;
   color: #18181a;
   background: #bfa14a;
-  margin-bottom: 0.5rem;
-  align-self: flex-start;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .hp-tutorial-card h3 {
   color: #ffd700;
   font-size: 1rem;
-  margin: 0 0 auto;
-  padding-bottom: 0.75rem;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
 }
 .hp-tutorial-link {
   color: #bfa14a;
   font-size: 0.85rem;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* ========== CTA ========== */
 .hp-cta {
+  position: relative;
+  z-index: 1;
   text-align: center;
   padding: 5rem 2rem;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(191, 161, 74, 0.05) 100%
-  );
 }
 .hp-cta h2 {
   font-size: 1.8rem;
@@ -332,6 +368,8 @@
 
 /* ========== Footer ========== */
 .hp-footer {
+  position: relative;
+  z-index: 1;
   text-align: center;
   padding: 2rem;
   border-top: 1px solid rgba(191, 161, 74, 0.1);
@@ -416,8 +454,11 @@
   .hp-features {
     grid-template-columns: repeat(2, 1fr);
   }
-  .hp-tutorials {
-    grid-template-columns: repeat(2, 1fr);
+  .hp-tutorials-cards {
+    flex-direction: column;
+  }
+  .hp-tutorial-cover {
+    width: 140px;
   }
 }
 @media (max-width: 768px) {
@@ -432,6 +473,33 @@
   }
   .hp-tutorials {
     grid-template-columns: 1fr;
+  }
+  .hp-tutorials-layout {
+    flex-direction: column;
+  }
+  .hp-tutorials-intro {
+    flex: none;
+    text-align: center;
+    order: -1;
+  }
+  .hp-tutorials-intro .hp-section-title {
+    text-align: center;
+  }
+  .hp-tutorial-card {
+    flex-direction: column;
+  }
+  .hp-tutorial-cover {
+    width: 100%;
+    min-height: 80px;
+    height: 100px;
+  }
+  .hp-tutorial-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .hp-tutorial-link {
+    margin-left: 0;
   }
   .hp-hero-title {
     font-size: 3rem;
@@ -477,6 +545,9 @@
 @media (max-width: 600px) {
   .hp-tutorials {
     grid-template-columns: 1fr;
+  }
+  .hp-tutorials-cards {
+    flex-direction: column;
   }
   .hp-section-dark {
     padding-left: 1.5rem;

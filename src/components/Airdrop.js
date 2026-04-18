@@ -6,6 +6,7 @@ import { supabase } from '../services/supabaseClient';
 import Swal from 'sweetalert2';
 import useUserStore from '../store/userStore';
 import { safeMarkdown, escapeHtml } from '../utils/sanitize';
+import { useLang } from '../i18n/context';
 
 function Airdrop() {
   const [airdrops, setAirdrops] = useState([]);
@@ -15,6 +16,7 @@ function Airdrop() {
 
   const { userInfo } = useUserStore();
   const isVerified = userInfo.is_verified;
+  const { t } = useLang();
 
   useEffect(() => {
     const fetchAirdrops = async () => {
@@ -60,20 +62,20 @@ function Airdrop() {
         <div class="airdrop-popup-content">
           ${airdrop.content
             ? `<div id="markdown-content-container"></div>`
-            : `<div style="color:rgba(255,255,255,0.4);text-align:center;padding:2rem">暂无详细活动内容</div>`
+            : `<div style="color:rgba(255,255,255,0.4);text-align:center;padding:2rem">${t('airdrop.noDetail')}</div>`
           }
           <div class="airdrop-popup-info">
-            <p><b>奖励：</b>${escapeHtml(airdrop.reward || '暂无')}</p>
-            <p><b>开始时间：</b>${escapeHtml(airdrop.start_time || '待定')}</p>
-            <p><b>结束时间：</b>${escapeHtml(airdrop.end_time || '待定')}</p>
-            <p><b>状态：</b>${escapeHtml(getStatusText(airdrop.status))}</p>
+            <p><b>${t('airdrop.reward')}</b>${escapeHtml(airdrop.reward || t('airdrop.noReward'))}</p>
+            <p><b>${t('airdrop.startTime')}</b>${escapeHtml(airdrop.start_time || t('airdrop.tbd'))}</p>
+            <p><b>${t('airdrop.endTime')}</b>${escapeHtml(airdrop.end_time || t('airdrop.tbd'))}</p>
+            <p><b>${t('airdrop.status')}</b>${escapeHtml(getStatusText(airdrop.status))}</p>
           </div>
         </div>
       `,
       showCloseButton: true,
       showCancelButton: airdrop.status === 'ongoing',
-      cancelButtonText: '关闭',
-      confirmButtonText: airdrop.status === 'ongoing' ? '立即参与' : '关闭',
+      cancelButtonText: t('airdrop.close'),
+      confirmButtonText: airdrop.status === 'ongoing' ? t('airdrop.joinNow') : t('airdrop.close'),
       confirmButtonColor: '#bfa14a',
       background: '#1a1a1a',
       color: '#eee',
@@ -103,27 +105,27 @@ function Airdrop() {
 
   const handleJoinActivity = async (airdrop) => {
     if (!userInfo.id) {
-      Swal.fire({ title: '需要登录', text: '请先登录后再参与活动', icon: 'warning', background: '#1e222d', color: '#d1d4dc' });
+      Swal.fire({ title: t('airdrop.needLogin'), text: t('airdrop.needLoginMsg'), icon: 'warning', background: '#1e222d', color: '#d1d4dc' });
       return;
     }
     if (!isVerified) {
-      Swal.fire({ title: '需要验证', text: '请先完成账号验证后再参与活动', icon: 'warning', background: '#1e222d', color: '#d1d4dc' });
+      Swal.fire({ title: t('airdrop.needVerify'), text: t('airdrop.needVerifyMsg'), icon: 'warning', background: '#1e222d', color: '#d1d4dc' });
       return;
     }
 
     const { value: formValues } = await Swal.fire({
-      title: '参与活动',
+      title: t('airdrop.joinActivity'),
       html: `
         <div style="text-align:left">
-          <label style="color:#bfa14a;font-size:0.85rem">描述信息</label>
-          <textarea id="submission-text" class="swal2-textarea" placeholder="请输入活动参与描述..." style="margin-bottom:0.8rem"></textarea>
-          <label style="color:#bfa14a;font-size:0.85rem">上传截图</label>
+          <label style="color:#bfa14a;font-size:0.85rem">${t('airdrop.descLabel')}</label>
+          <textarea id="submission-text" class="swal2-textarea" placeholder="${t('airdrop.descPlaceholder')}" style="margin-bottom:0.8rem"></textarea>
+          <label style="color:#bfa14a;font-size:0.85rem">${t('airdrop.screenshotLabel')}</label>
           <input id="submission-file" type="file" accept="image/*" class="swal2-file">
         </div>
       `,
       showCancelButton: true,
-      cancelButtonText: '取消',
-      confirmButtonText: '提交',
+      cancelButtonText: t('airdrop.cancel'),
+      confirmButtonText: t('airdrop.submit'),
       background: '#1e222d',
       color: '#d1d4dc',
       confirmButtonColor: '#bfa14a',
@@ -131,8 +133,8 @@ function Airdrop() {
       preConfirm: () => {
         const text = document.getElementById('submission-text').value;
         const file = document.getElementById('submission-file').files[0];
-        if (!text) { Swal.showValidationMessage('请输入描述信息'); return false; }
-        if (!file) { Swal.showValidationMessage('请上传截图'); return false; }
+        if (!text) { Swal.showValidationMessage(t('airdrop.enterDesc')); return false; }
+        if (!file) { Swal.showValidationMessage(t('airdrop.uploadScreenshot')); return false; }
         return { text, file };
       }
     });
@@ -165,14 +167,15 @@ function Airdrop() {
 
       await supabase.rpc('increment_participants', { airdrop_id: airdrop.id });
 
-      Swal.fire({ icon: 'success', title: '提交成功', text: '活动参与申请已提交，请等待审核', background: '#1e222d', color: '#d1d4dc' });
+      Swal.fire({ icon: 'success', title: t('airdrop.submitSuccess'), text: t('airdrop.submitSuccessMsg'), background: '#1e222d', color: '#d1d4dc' });
     } catch (error) {
-      Swal.fire({ icon: 'error', title: '提交失败', text: error?.message || '请稍后重试', background: '#1e222d', color: '#d1d4dc' });
+      Swal.fire({ icon: 'error', title: t('airdrop.submitFailed'), text: error?.message || t('airdrop.submitFailed'), background: '#1e222d', color: '#d1d4dc' });
     }
   };
 
   const getStatusText = (status) => {
-    return { upcoming: '即将开始', ongoing: '进行中', ended: '已结束' }[status] || '';
+    const map = { upcoming: t('airdrop.statusUpcoming'), ongoing: t('airdrop.statusOngoing'), ended: t('airdrop.statusEnded') };
+    return map[status] || '';
   };
 
   const getStatusColor = (status) => {
@@ -180,18 +183,18 @@ function Airdrop() {
   };
 
   const filterTabs = [
-    { key: 'all', label: '全部' },
-    { key: 'ongoing', label: '进行中' },
-    { key: 'upcoming', label: '即将开始' },
-    { key: 'ended', label: '已结束' },
+    { key: 'all', label: t('airdrop.filterAll') },
+    { key: 'ongoing', label: t('airdrop.filterOngoing') },
+    { key: 'upcoming', label: t('airdrop.filterUpcoming') },
+    { key: 'ended', label: t('airdrop.filterEnded') },
   ];
 
   if (!isVerified) {
     return (
       <div className="component-container">
         <div className="verification-required">
-          <h2>需要账号验证</h2>
-          <p>请先完成账号验证（绑定 UID）后再访问此页面</p>
+          <h2>{t('airdrop.needVerifyTitle')}</h2>
+          <p>{t('airdrop.needVerifyDesc')}</p>
         </div>
       </div>
     );
@@ -224,7 +227,7 @@ function Airdrop() {
             <input
               type="text"
               className="airdrop-search"
-              placeholder="搜索活动..."
+              placeholder={t('airdrop.searchPlaceholder')}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               style={{
@@ -243,9 +246,9 @@ function Airdrop() {
 
           {/* 活动列表 */}
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>加载中...</div>
+            <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>{t('airdrop.loading')}</div>
           ) : filteredAirdrops.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>暂无活动</div>
+            <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>{t('airdrop.noData')}</div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
               {filteredAirdrops.map(airdrop => (
@@ -285,8 +288,8 @@ function Airdrop() {
                     </span>
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', lineHeight: '1.6' }}>
-                    {airdrop.reward && <div><span style={{ color: 'rgba(255,255,255,0.3)' }}>奖励：</span>{airdrop.reward}</div>}
-                    {airdrop.end_time && <div><span style={{ color: 'rgba(255,255,255,0.3)' }}>截止：</span>{airdrop.end_time}</div>}
+                    {airdrop.reward && <div><span style={{ color: 'rgba(255,255,255,0.3)' }}>{t('airdrop.rewardLabel')}</span>{airdrop.reward}</div>}
+                    {airdrop.end_time && <div><span style={{ color: 'rgba(255,255,255,0.3)' }}>{t('airdrop.deadlineLabel')}</span>{airdrop.end_time}</div>}
                   </div>
                   <button style={{
                     marginTop: '0.8rem',
@@ -299,7 +302,7 @@ function Airdrop() {
                     fontSize: '0.85rem',
                     cursor: 'pointer',
                   }}>
-                    {airdrop.status === 'ongoing' ? '查看详情 & 参与' : '查看详情'}
+                    {airdrop.status === 'ongoing' ? t('airdrop.viewDetailJoin') : t('airdrop.viewDetail')}
                   </button>
                 </div>
               ))}

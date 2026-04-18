@@ -343,3 +343,46 @@
 - 环境变量：`REACT_APP_SUPABASE_URL`、`REACT_APP_SUPABASE_ANON_KEY`
 
 ---
+
+## [2026-04-18] Phase 3.5 — XSS 安全过滤
+
+**目标**：所有 Markdown/HTML 渲染统一添加 DOMPurify 消毒，防止脚本注入
+
+**改动文件**：
+
+| 文件 | 操作 | 说明 |
+|---|---|---|
+| `src/utils/sanitize.js` | 新建 | `safeMarkdown()`（marked + DOMPurify）+ `escapeHtml()` 工具函数 |
+| `src/components/Airdrop.js` | 修改 | `marked.parse` → `safeMarkdown`，Swal 模板变量转义 |
+| `src/components/NewbieGuide.js` | 修改 | 同上 |
+| `src/components/ContractTutorial.js` | 修改 | ReactMarkdown+rehypeRaw → `safeMarkdown`+dangerouslySetInnerHTML |
+| `src/pages/DocsPage.js` | 修改 | `marked.parse` → `safeMarkdown` |
+| `src/components/PointsExchange.js` | 修改 | Swal 模板 `${item.name}` → `escapeHtml(item.name)` |
+
+**防护范围**：`<script>` 标签、onclick/onerror 事件属性、javascript: 协议链接、HTML 特殊字符
+
+---
+
+## [2026-04-18] 代码优化 — 验证状态 + userStore + 清理
+
+**目标**：减少重复数据库查询，简化登录逻辑，清理死代码
+
+**改动文件**：
+
+| 文件 | 操作 | 说明 |
+|---|---|---|
+| `src/components/Airdrop.js` | 修改 | 移除 is_verified 单独查询，改为从 store 读取 |
+| `src/components/NewbieGuide.js` | 修改 | 同上 |
+| `src/components/ContractTutorial.js` | 修改 | 同上（含 user_type） |
+| `src/components/PointsExchange.js` | 修改 | 同上 |
+| `src/store/userStore.js` | 修改 | `login()` 去掉假数据 fallback，简化为调 `fetchUserByUsername` |
+| `src/Login.js` | 修改 | 直接调 `fetchUserByUsername`，消除登录时重复查数据库 |
+| `src/components/ContentManagement.js` | 删除 | 无引用的死代码（237 行） |
+| `src/pages/HomePage.js` | 修改 | particles.js 从 CDN 动态加载改为 npm import |
+
+**效果**：
+- 每个页面加载减少 1 次 is_verified 数据库查询
+- 登录时数据库查询从 2 次减为 1 次
+- 消除外部 CDN 依赖
+
+---

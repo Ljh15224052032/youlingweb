@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import 'particles.js';
 import './HomePage.css';
 
 const LogoIcon = ({ size = 48 }) => (
@@ -65,13 +66,8 @@ function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (document.getElementById('hp-particles-js').children.length > 0) return;
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js';
-    script.async = true;
-    script.onload = () => {
-      if (window.particlesJS) {
-        window.particlesJS('hp-particles-js', {
+    if (window.particlesJS && document.getElementById('hp-particles-js')) {
+      window.particlesJS('hp-particles-js', {
           particles: {
             number: { value: 50, density: { enable: true, value_area: 900 } },
             color: { value: '#bfa14a' },
@@ -95,9 +91,7 @@ function HomePage() {
           },
           retina_detect: true
         });
-      }
-    };
-    document.body.appendChild(script);
+    }
     return () => {
       const el = document.getElementById('hp-particles-js');
       if (el) el.innerHTML = '';

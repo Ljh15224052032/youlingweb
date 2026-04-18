@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GHOST - UI 样式展示</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h1 class="page-title">UI 样式展示</h1>
+
+  <!-- 导航 -->
+  <nav class="nav-bar">
+    <span class="nav-current">全部样式</span>
+    <div class="nav-dropdown">
+      <a href="index.html" class="active">全部样式</a>
+      <a href="card-compare.html">登录卡片对比</a>
+      <a href="stat-compare.html">统计卡片对比</a>
+    </div>
+  </nav>
+
+  <!-- ===== 按钮 ===== -->
+  <section class="sec">
+    <h2>按钮 Buttons</h2>
+    <div class="row">
+      <button class="hp-btn-gold">金色按钮</button>
+      <button class="hp-btn-gold hp-btn-lg">大号金色</button>
+      <button class="hp-btn-outline">描边按钮</button>
+      <button class="hp-btn-outline hp-btn-lg">大号描边</button>
+    </div>
+    <div class="row dark-bg">
+      <button class="action-btn">action-btn</button>
+      <button class="control-btn primary">control-btn</button>
+      <button class="tab-btn active">tab-btn active</button>
+      <button class="tab-btn">tab-btn</button>
+    </div>
+  </section>
+
+  <!-- ===== 功能卡片 ===== -->
+  <section class="sec">
+    <h2>功能卡片 hp-feature-card</h2>
+    <div class="grid-3">
+      <div class="hp-feature-card">
+        <div class="hp-feature-icon">
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#bfa14a" opacity="0.2"/>
+            <path d="M12 6v6l4 2" stroke="#ffd700" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>功能一</h3>
+        <p>功能卡片描述文字，展示卡片样式效果</p>
+      </div>
+      <div class="hp-feature-card">
+        <div class="hp-feature-icon">
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24">
+            <rect x="4" y="4" width="16" height="16" rx="3" fill="#bfa14a" opacity="0.2"/>
+            <path d="M8 8h8v2H8zm0 4h6v2H8z" fill="#ffd700"/>
+          </svg>
+        </div>
+        <h3>功能二</h3>
+        <p>功能卡片描述文字，展示卡片样式效果</p>
+      </div>
+      <div class="hp-feature-card">
+        <div class="hp-feature-icon">
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24">
+            <rect x="6" y="3" width="12" height="18" rx="2" fill="#bfa14a" opacity="0.2"/>
+            <path d="M9 7h6M9 11h6M9 15h3" stroke="#ffd700" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3>功能三</h3>
+        <p>功能卡片描述文字，展示卡片样式效果</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 教学卡片 ===== -->
+  <section class="sec">
+    <h2>教学卡片 hp-tutorial-card</h2>
+    <div class="grid-3">
+      <div class="hp-tutorial-card">
+        <div class="hp-tutorial-cover"></div>
+        <div class="hp-tutorial-info">
+          <span class="hp-tutorial-tag">分类 1</span>
+          <h3>教学文章标题 1</h3>
+          <span class="hp-tutorial-link">阅读全文 →</span>
+        </div>
+      </div>
+      <div class="hp-tutorial-card">
+        <div class="hp-tutorial-cover"></div>
+        <div class="hp-tutorial-info">
+          <span class="hp-tutorial-tag">分类 2</span>
+          <h3>教学文章标题 2</h3>
+          <span class="hp-tutorial-link">阅读全文 →</span>
+        </div>
+      </div>
+      <div class="hp-tutorial-card">
+        <div class="hp-tutorial-cover"></div>
+        <div class="hp-tutorial-info">
+          <span class="hp-tutorial-tag">分类 3</span>
+          <h3>教学文章标题 3</h3>
+          <span class="hp-tutorial-link">阅读全文 →</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 空投卡片 ===== -->
+  <section class="sec">
+    <h2>空投卡片 airdrop-card</h2>
+    <div class="grid-5">
+      <div class="airdrop-card">
+        <div class="airdrop-card-header">
+          <span class="status-badge active">进行中</span>
+          <span class="airdrop-date">2026-04-18</span>
+        </div>
+        <h3>空投项目 1</h3>
+        <p class="airdrop-desc">项目简短描述文字</p>
+        <button class="hp-btn-gold" style="width:100%;margin-top:0.5rem">参与</button>
+      </div>
+      <div class="airdrop-card">
+        <div class="airdrop-card-header">
+          <span class="status-badge active">进行中</span>
+          <span class="airdrop-date">2026-04-19</span>
+        </div>
+        <h3>空投项目 2</h3>
+        <p class="airdrop-desc">项目简短描述文字</p>
+        <button class="hp-btn-gold" style="width:100%;margin-top:0.5rem">参与</button>
+      </div>
+      <div class="airdrop-card">
+        <div class="airdrop-card-header">
+          <span class="status-badge completed">已完成</span>
+          <span class="airdrop-date">2026-04-20</span>
+        </div>
+        <h3>空投项目 3</h3>
+        <p class="airdrop-desc">项目简短描述文字</p>
+        <button class="hp-btn-gold" style="width:100%;margin-top:0.5rem">参与</button>
+      </div>
+      <div class="airdrop-card">
+        <div class="airdrop-card-header">
+          <span class="status-badge pending">待处理</span>
+          <span class="airdrop-date">2026-04-21</span>
+        </div>
+        <h3>空投项目 4</h3>
+        <p class="airdrop-desc">项目简短描述文字</p>
+        <button class="hp-btn-gold" style="width:100%;margin-top:0.5rem">参与</button>
+      </div>
+      <div class="airdrop-card">
+        <div class="airdrop-card-header">
+          <span class="status-badge active">进行中</span>
+          <span class="airdrop-date">2026-04-22</span>
+        </div>
+        <h3>空投项目 5</h3>
+        <p class="airdrop-desc">项目简短描述文字</p>
+        <button class="hp-btn-gold" style="width:100%;margin-top:0.5rem">参与</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 玻璃卡片 ===== -->
+  <section class="sec">
+    <h2>玻璃卡片 glass-card</h2>
+    <div style="display:flex;justify-content:center">
+      <div class="glass-card" style="width:360px">
+        <h2 style="color:#bfa14a;margin-bottom:1rem">登录表单样式</h2>
+        <input type="text" placeholder="用户名" class="test-input">
+        <input type="password" placeholder="密码" class="test-input">
+        <button class="hp-btn-gold" style="width:100%">登录</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 教程卡片 ===== -->
+  <section class="sec">
+    <h2>教程卡片 tutorial-item</h2>
+    <div class="grid-3">
+      <div class="tutorial-item">
+        <div class="tutorial-item-header">
+          <h3>教程标题 1</h3>
+          <span class="level-badge beginner">入门</span>
+        </div>
+        <p class="tutorial-item-desc">教程简短描述文字内容</p>
+      </div>
+      <div class="tutorial-item">
+        <div class="tutorial-item-header">
+          <h3>教程标题 2</h3>
+          <span class="level-badge intermediate">中级</span>
+        </div>
+        <p class="tutorial-item-desc">教程简短描述文字内容</p>
+      </div>
+      <div class="tutorial-item">
+        <div class="tutorial-item-header">
+          <h3>教程标题 3</h3>
+          <span class="level-badge advanced">高级</span>
+        </div>
+        <p class="tutorial-item-desc">教程简短描述文字内容</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 商城卡片 ===== -->
+  <section class="sec">
+    <h2>商城卡片 shop-item</h2>
+    <div class="grid-3">
+      <div class="shop-item">
+        <h3>商品 1</h3>
+        <p class="shop-desc">商品描述文字</p>
+        <span class="shop-points">100 积分</span>
+        <button class="exchange-btn">兑换</button>
+      </div>
+      <div class="shop-item">
+        <h3>商品 2</h3>
+        <p class="shop-desc">商品描述文字</p>
+        <span class="shop-points">200 积分</span>
+        <button class="exchange-btn">兑换</button>
+      </div>
+      <div class="shop-item">
+        <h3>商品 3</h3>
+        <p class="shop-desc">商品描述文字</p>
+        <span class="shop-points">300 积分</span>
+        <button class="exchange-btn">兑换</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 统计卡片 ===== -->
+  <section class="sec">
+    <h2>统计卡片 stat-card</h2>
+    <div class="grid-4">
+      <div class="stat-card">
+        <span class="stat-value">1,234</span>
+        <span class="stat-label">总用户</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">567</span>
+        <span class="stat-label">活跃用户</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">89,012</span>
+        <span class="stat-label">总积分</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">42</span>
+        <span class="stat-label">今日新增</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 徽章 ===== -->
+  <section class="sec">
+    <h2>徽章 Badges</h2>
+    <div class="row">
+      <span class="status-badge active">进行中</span>
+      <span class="status-badge completed">已完成</span>
+      <span class="status-badge pending">待处理</span>
+      <span class="category-badge">分类标签</span>
+      <span class="hp-tutorial-tag">教程标签</span>
+      <span class="level-badge beginner">入门</span>
+      <span class="level-badge intermediate">中级</span>
+      <span class="level-badge advanced">高级</span>
+      <span class="level-badge expert">专家</span>
+    </div>
+  </section>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+.lang-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 9999;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(191, 161, 74, 0.4);
+  background: rgba(18, 18, 20, 0.9);
+  color: #ffd700;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  box-shadow:
+    0 0 15px rgba(191, 161, 74, 0.15),
+    0 0 60px rgba(191, 161, 74, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.lang-toggle:hover {
+  box-shadow:
+    0 0 20px rgba(191, 161, 74, 0.35),
+    0 0 80px rgba(191, 161, 74, 0.1);
+  border-color: rgba(191, 161, 74, 0.6);
+  transform: scale(1.08);
+}

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GHOST - 统计卡片样式对比</title>
+  <link rel="stylesheet" href="stat-compare.css">
+</head>
+<body>
+
+  <h1 class="page-title">统计卡片样式对比</h1>
+  <nav class="nav-bar">
+    <span class="nav-current">统计卡片对比</span>
+    <div class="nav-dropdown">
+      <a href="index.html">全部样式</a>
+      <a href="card-compare.html">登录卡片对比</a>
+      <a href="stat-compare.html" class="active">统计卡片对比</a>
+    </div>
+  </nav>
+  <p class="page-desc">原始样式 vs 多种改进方案</p>
+
+  <!-- ===== 方案 A：原始 ===== -->
+  <section class="compare-section">
+    <span class="compare-label">A - 原始</span>
+    <div class="stat-row">
+      <div class="stat-card card-original">
+        <span class="stat-value">1,234</span>
+        <span class="stat-label">总用户</span>
+      </div>
+      <div class="stat-card card-original">
+        <span class="stat-value">567</span>
+        <span class="stat-label">活跃用户</span>
+      </div>
+      <div class="stat-card card-original">
+        <span class="stat-value">89,012</span>
+        <span class="stat-label">总积分</span>
+      </div>
+      <div class="stat-card card-original">
+        <span class="stat-value">42</span>
+        <span class="stat-label">今日新增</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 方案 B：霓虹发光 ===== -->
+  <section class="compare-section">
+    <span class="compare-label">B - 霓虹发光</span>
+    <div class="stat-row">
+      <div class="stat-card card-b">
+        <span class="stat-value">1,234</span>
+        <span class="stat-label">总用户</span>
+      </div>
+      <div class="stat-card card-b">
+        <span class="stat-value">567</span>
+        <span class="stat-label">活跃用户</span>
+      </div>
+      <div class="stat-card card-b">
+        <span class="stat-value">89,012</span>
+        <span class="stat-label">总积分</span>
+      </div>
+      <div class="stat-card card-b">
+        <span class="stat-value">42</span>
+        <span class="stat-label">今日新增</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 方案 C：渐变背景 ===== -->
+  <section class="compare-section">
+    <span class="compare-label">C - 渐变背景</span>
+    <div class="stat-row">
+      <div class="stat-card card-c">
+        <span class="stat-value">1,234</span>
+        <span class="stat-label">总用户</span>
+      </div>
+      <div class="stat-card card-c">
+        <span class="stat-value">567</span>
+        <span class="stat-label">活跃用户</span>
+      </div>
+      <div class="stat-card card-c">
+        <span class="stat-value">89,012</span>
+        <span class="stat-label">总积分</span>
+      </div>
+      <div class="stat-card card-c">
+        <span class="stat-value">42</span>
+        <span class="stat-label">今日新增</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 方案 D：图标 + 进度条 ===== -->
+  <section class="compare-section">
+    <span class="compare-label">D - 图标 + 进度条</span>
+    <div class="stat-row">
+      <div class="stat-card card-d">
+        <div class="stat-header">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="rgba(191,161,74,0.2)"/><path d="M12 6v6l4 2" stroke="#ffd700" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="stat-label-inline">总用户</span>
+        </div>
+        <span class="stat-value-big">1,234</span>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:78%"></div></div>
+        <span class="stat-trend up">↑ 12%</span>
+      </div>
+      <div class="stat-card card-d">
+        <div class="stat-header">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="rgba(191,161,74,0.3)"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="#bfa14a" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="stat-label-inline">活跃用户</span>
+        </div>
+        <span class="stat-value-big">567</span>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:46%"></div></div>
+        <span class="stat-trend up">↑ 8%</span>
+      </div>
+      <div class="stat-card card-d">
+        <div class="stat-header">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="rgba(191,161,74,0.2)"/><path d="M12 8v8M8 12h8" stroke="#ffd700" stroke-width="2"/></svg>
+          <span class="stat-label-inline">总积分</span>
+        </div>
+        <span class="stat-value-big">89,012</span>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:92%"></div></div>
+        <span class="stat-trend up">↑ 24%</span>
+      </div>
+      <div class="stat-card card-d">
+        <div class="stat-header">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="rgba(191,161,74,0.2)"/><path d="M8 8h8v2H8zm0 4h6v2H8z" fill="#ffd700"/></svg>
+          <span class="stat-label-inline">今日新增</span>
+        </div>
+        <span class="stat-value-big">42</span>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:35%"></div></div>
+        <span class="stat-trend down">↓ 3%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 方案 E：暗色悬浮 ===== -->
+  <section class="compare-section">
+    <span class="compare-label">E - 暗色悬浮</span>
+    <div class="stat-row">
+      <div class="stat-card card-e">
+        <span class="stat-value">1,234</span>
+        <span class="stat-label">总用户</span>
+      </div>
+      <div class="stat-card card-e">
+        <span class="stat-value">567</span>
+        <span class="stat-label">活跃用户</span>
+      </div>
+      <div class="stat-card card-e">
+        <span class="stat-value">89,012</span>
+        <span class="stat-label">总积分</span>
+      </div>
+      <div class="stat-card card-e">
+        <span class="stat-value">42</span>
+        <span class="stat-label">今日新增</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 方案 F：圆形指标 ===== -->
+  <section class="compare-section">
+    <span class="compare-label">F - 圆形指标</span>
+    <div class="stat-row">
+      <div class="stat-card card-f">
+        <div class="stat-ring" data-pct="78">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" class="ring-bg"/><circle cx="50" cy="50" r="42" class="ring-fill" style="stroke-dasharray:264;stroke-dashoffset:58"/></svg>
+          <span class="ring-value">78%</span>
+        </div>
+        <span class="stat-value">1,234</span>
+        <span class="stat-label">总用户</span>
+      </div>
+      <div class="stat-card card-f">
+        <div class="stat-ring">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" class="ring-bg"/><circle cx="50" cy="50" r="42" class="ring-fill" style="stroke-dasharray:264;stroke-dashoffset:143"/></svg>
+          <span class="ring-value">46%</span>
+        </div>
+        <span class="stat-value">567</span>
+        <span class="stat-label">活跃用户</span>
+      </div>
+      <div class="stat-card card-f">
+        <div class="stat-ring">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" class="ring-bg"/><circle cx="50" cy="50" r="42" class="ring-fill" style="stroke-dasharray:264;stroke-dashoffset:21"/></svg>
+          <span class="ring-value">92%</span>
+        </div>
+        <span class="stat-value">89,012</span>
+        <span class="stat-label">总积分</span>
+      </div>
+      <div class="stat-card card-f">
+        <div class="stat-ring">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" class="ring-bg"/><circle cx="50" cy="50" r="42" class="ring-fill" style="stroke-dasharray:264;stroke-dashoffset:172"/></svg>
+          <span class="ring-value">35%</span>
+        </div>
+        <span class="stat-value">42</span>
+        <span class="stat-label">今日新增</span>
+      </div>
+    </div>
+  </section>
+
+  <p class="page-note">在浏览器直接打开此文件预览，选中后回到项目同步样式</p>
+
+</body>
+</html>

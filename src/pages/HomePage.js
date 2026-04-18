@@ -81,7 +81,7 @@ const tutorials = [];
 
 function HomePage() {
   const navigate = useNavigate();
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const [guides, setGuides] = useState([]);
 
   const featureKeys = ['Airdrop', 'Newbie', 'Contract'];

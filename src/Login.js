@@ -7,7 +7,7 @@ import useUserStore from './store/userStore';
 
 function Login() {
   const navigate = useNavigate();
-  const login = useUserStore(state => state.login);
+  const fetchUserByUsername = useUserStore(state => state.fetchUserByUsername);
   const [emailError, setEmailError] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -64,11 +64,8 @@ function Login() {
         return;
       }
 
-      // 登录成功，调用 store 登录并跳转
-      await login({
-        username: email,
-        email: email,
-      });
+      // 登录成功，从数据库获取完整用户信息写入 store
+      await fetchUserByUsername(email);
       navigate('/dashboard');
 
     } catch (err) {

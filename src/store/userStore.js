@@ -2,15 +2,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '../services/supabaseClient';
 
-// 生成唯一邀请码
-
-// 生成父邀请码（模拟从其他用户获取）
-
-
 const useUserStore = create(
   persist(
     (set, get) => ({
-      // 用户状态
       isLoggedIn: false,
       userInfo: {
         id: null, // 用户ID
@@ -31,33 +25,9 @@ const useUserStore = create(
         premium_days: 0, // 高级会员剩余天数
       },
 
-      // 登录
-      login: async (userData) => {
-        // 如果传入了 username，从 Supabase 获取完整用户信息
-        if (userData.username || userData.email) {
-          const username = userData.username || userData.email;
-          const supabaseUser = await get().fetchUserByUsername(username);
-          
-          if (supabaseUser) {
-            // 成功从 Supabase 获取到用户信息，已经在 fetchUserByUsername 中设置了 store
-            return;
-          }
-        }
-        
-        // 如果没有从 Supabase 获取到用户信息，使用传入的数据
-        set({
-          isLoggedIn: true,
-          userInfo: {
-            ...userData,
-            joinDate: new Date().toISOString().split('T')[0],
-            level: 'VIP',
-            points: userData.points || 1250,
-            parentInviteCode: userData.parent_invite_code || '',
-            myInviteCode: userData.invite_code || '',
-            wechat: userData.wechat || '',
-            okxUID: userData.okx_uid || '',
-          }
-        });
+      // 登录（由 fetchUserByUsername 完成数据获取，这里只设标记）
+      login: async (username) => {
+        await get().fetchUserByUsername(username);
       },
 
       // 登出

@@ -13,7 +13,6 @@ function Login() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // 校验邮箱格式
   const validateEmail = (value) => {
     return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
   };
@@ -25,7 +24,7 @@ function Login() {
       setEmailError('');
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
@@ -40,7 +39,6 @@ function Login() {
     try {
       setSubmitting(true);
 
-      // 从 Supabase 查询用户
       const { data: user, error } = await supabase
         .from('users')
         .select('id, username, password_hash, nickname, points, invite_code, parent_invite_code, binance_uid, bg_uid, created_at')
@@ -48,28 +46,28 @@ function Login() {
         .limit(1)
         .maybeSingle();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (!user) {
         alert('用户不存在');
         return;
       }
 
-      // 验证密码
+      if (!user.password_hash || typeof user.password_hash !== 'string') {
+        alert('账号数据异常，请联系管理员');
+        return;
+      }
+
       const passwordMatch = await bcrypt.compare(password, user.password_hash);
       if (!passwordMatch) {
         alert('密码错误');
         return;
       }
 
-      // 登录成功，从数据库获取完整用户信息写入 store
       await fetchUserByUsername(email);
       navigate('/dashboard');
 
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('登录失败:', err);
       alert(`登录失败：${err?.message || '请稍后重试'}`);
     } finally {
@@ -79,7 +77,7 @@ function Login() {
 
   return (
     <div className="login-form">
-      <div className="ghost-logo">GHOST</div>
+      <div className="ghost-logo">GHOST <svg width="36" height="36" viewBox="0 0 220 220" fill="none" style={{verticalAlign:'middle'}}><path fillRule="evenodd" clipRule="evenodd" d="M75 109.5L13 19H71L108.5 73.5L146 19H197L134 109.5V187H169.5L202.5 166.5V206.5H75V109.5ZM101.5 82.5L90.5 99.5V194.5L81 199.5L79.5 99.5L31 28.5H66.5L101.5 82.5Z" fill="url(#yl-grad)"/><defs><linearGradient id="yl-grad" x1="202" y1="206" x2="108" y2="17" gradientUnits="userSpaceOnUse"><stop stopColor="white"/><stop offset="1" stopColor="#FFC107"/></linearGradient></defs></svg></div>
       <form className="glass-card" onSubmit={handleSubmit}>
         <h2 className="login-title">游领资本</h2>
         <input
@@ -107,4 +105,4 @@ function Login() {
   );
 }
 
-export default Login; 
+export default Login;

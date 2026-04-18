@@ -12,17 +12,12 @@ import useUserStore from './store/userStore';
 import './App.css';
 
 const LogoIcon = ({ size = 28 }) => (
-  <svg width={size} height={size} viewBox="0 0 190 188" fill="none">
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M62 90.5L0 0H58L95.5 54.5L133 0H184L121 90.5V168H156.5L189.5 147.5V187.5H62V90.5ZM88.5 63.5L77.5 80.5V175.5L68 180.5L66.5 80.5L18 9.5H53.5L88.5 63.5Z"
-      fill="url(#logo-grad)"
-    />
+  <svg width={size} height={size * 295 / 345} viewBox="0 0 345 295" fill="none">
+    <path d="M143 32C154.331 32 165.282 33.6263 175.634 36.6553C182.871 35.2416 190.349 34.5 198 34.5C255.978 34.5 304.019 77.0344 312.626 132.601C319.038 133.401 324 138.871 324 145.5C324 151.737 319.607 156.948 313.746 158.208C309.779 218.679 259.475 266.5 198 266.5C186.669 266.5 175.717 264.873 165.365 261.844C158.128 263.257 150.651 264 143 264C78.935 264 27 212.065 27 148C27 83.935 78.935 32 143 32Z" fill="url(#logo-grad)"/>
     <defs>
-      <linearGradient id="logo-grad" x1="189" y1="187" x2="95" y2="-2" gradientUnits="userSpaceOnUse">
-        <stop stopColor="white" />
-        <stop offset="1" stopColor="#FFC107" />
+      <linearGradient id="logo-grad" x1="110" y1="40.5" x2="193.5" y2="211" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#E8EB83"/>
+        <stop offset="1" stopColor="#BDA938"/>
       </linearGradient>
     </defs>
   </svg>

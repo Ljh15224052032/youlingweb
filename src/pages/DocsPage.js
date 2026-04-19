@@ -4,6 +4,7 @@ import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import Swal from "sweetalert2";
 import { safeMarkdown } from "../utils/sanitize";
+import { handleWechatLinkClick } from "../utils/wechatLink";
 
 const docs = [
   {
@@ -279,6 +280,8 @@ function DocsContent({ doc }) {
   const html = safeMarkdown(doc.content);
 
   const handleClick = (e) => {
+    handleWechatLinkClick(e);
+
     if (e.target.tagName !== "IMG") return;
 
     const container = e.currentTarget;

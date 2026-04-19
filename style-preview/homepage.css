@@ -1,0 +1,385 @@
+/* ========== 全局 ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+
+.hp-container {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #0d0d0f 0%, #1a1508 40%, #0d0d0f 100%);
+  color: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
+
+/* ========== 左上角图标 ========== */
+.hp-top-icon {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+/* ========== GHOST 标题 ========== */
+.hp-ghost-title {
+  margin-top: 3rem;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #ffd700;
+  letter-spacing: 8px;
+  font-family: "Cinzel", serif;
+  text-shadow: 0 4px 24px rgba(191, 161, 74, 0.3);
+  z-index: 5;
+  flex-shrink: 0;
+}
+
+/* ========== 横向滑动容器 ========== */
+.hp-slider {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: grab;
+  position: relative;
+  z-index: 1;
+}
+.hp-slide {
+  min-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+  position: relative;
+}
+.hp-particle-canvas {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 650px;
+  height: 507px;
+  pointer-events: none;
+  z-index: 100;
+}
+.hp-slide-content {
+  max-width: 900px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== Hero 分区 ========== */
+.hp-hero-subtitle {
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 4px;
+  margin: 0 0 1.5rem;
+}
+.hp-hero-desc {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.8;
+  margin: 0 0 2.5rem;
+  max-width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hp-hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* ========== 按钮 ========== */
+.hp-btn-outline {
+  background: transparent;
+  border: 1px solid #bfa14a;
+  color: #ffd700;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.hp-btn-outline:hover {
+  background: rgba(191, 161, 74, 0.1);
+}
+.hp-btn-gold {
+  background: linear-gradient(135deg, #bfa14a, #ffd700);
+  border: none;
+  color: #18181a;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.hp-btn-gold:hover {
+  box-shadow: 0 0 20px rgba(191, 161, 74, 0.3);
+}
+.hp-btn-lg {
+  padding: 0.75rem 2.5rem;
+  font-size: 1rem;
+}
+
+/* ========== Section 标题 ========== */
+.hp-section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffd700;
+  margin: 0 0 2rem;
+}
+.hp-section-desc {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  margin: -1.2rem 0 2rem;
+}
+
+/* ========== 功能卡片 ========== */
+.hp-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.hp-feature-card {
+  background: rgba(18, 18, 20, 0.9);
+  border: 1px solid rgba(191, 161, 74, 0.4);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s;
+  box-shadow: 0 0 15px rgba(191, 161, 74, 0.15), 0 0 60px rgba(191, 161, 74, 0.05), inset 0 1px 0 rgba(255, 215, 0, 0.1);
+}
+.hp-feature-card:hover {
+  border-color: rgba(191, 161, 74, 0.7);
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(191, 161, 74, 0.3), 0 0 80px rgba(191, 161, 74, 0.1), inset 0 1px 0 rgba(255, 215, 0, 0.2);
+}
+.hp-feature-icon {
+  margin-bottom: 1rem;
+}
+.hp-feature-card h3 {
+  color: #ffd700;
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+.hp-feature-card p {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ========== 教学卡片 ========== */
+.hp-tutorials-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.hp-tutorial-card {
+  display: flex;
+  flex-direction: row;
+  background: rgba(18, 18, 20, 0.9);
+  border: 1px solid rgba(191, 161, 74, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(191, 161, 74, 0.15), 0 0 60px rgba(191, 161, 74, 0.05), inset 0 1px 0 rgba(255, 215, 0, 0.1);
+}
+.hp-tutorial-card:hover {
+  border-color: rgba(191, 161, 74, 0.7);
+  box-shadow: 0 0 20px rgba(191, 161, 74, 0.3), 0 0 80px rgba(191, 161, 74, 0.1), inset 0 1px 0 rgba(255, 215, 0, 0.2);
+}
+.hp-tutorial-cover {
+  width: 140px;
+  min-height: 70px;
+  flex-shrink: 0;
+  background-color: rgba(191, 161, 74, 0.1);
+}
+.hp-tutorial-info {
+  padding: 0.75rem 1.25rem;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+}
+.hp-tutorial-tag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #18181a;
+  background: #bfa14a;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.hp-tutorial-card h3 {
+  color: #ffd700;
+  font-size: 1rem;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
+}
+.hp-tutorial-link {
+  color: #bfa14a;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ========== CTA 分区 ========== */
+.hp-cta-title {
+  font-size: 1.8rem;
+  color: #fff;
+  margin: 0 0 0.5rem;
+}
+.hp-cta-desc {
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 2rem;
+}
+.hp-social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+.hp-social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s;
+}
+.hp-social-icon:hover {
+  transform: translateY(-3px);
+  color: #fff;
+}
+.hp-social-icon.wechat:hover { background: #07c160; }
+.hp-social-icon.official-account:hover { background: #bfa14a; }
+.hp-copyright {
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.75rem;
+}
+
+/* ========== 底部圆形图标按钮组 ========== */
+.hp-nav-icons {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 0 1.5rem;
+  z-index: 10;
+  flex-shrink: 0;
+}
+.hp-icon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+.hp-icon-btn svg {
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(191, 161, 74, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.3s;
+}
+.hp-icon-btn span {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  transition: color 0.3s;
+}
+.hp-icon-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+.hp-icon-btn:hover svg {
+  border-color: rgba(191, 161, 74, 0.35);
+  background: rgba(191, 161, 74, 0.06);
+}
+.hp-icon-btn.active {
+  color: #ffd700;
+}
+.hp-icon-btn.active svg {
+  border-color: rgba(191, 161, 74, 0.6);
+  background: rgba(191, 161, 74, 0.12);
+  box-shadow: 0 0 15px rgba(191, 161, 74, 0.15), 0 0 40px rgba(191, 161, 74, 0.05);
+}
+.hp-icon-btn.active span {
+  color: #ffd700;
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+  .hp-particle-canvas {
+    width: 260px;
+    height: 200px;
+    position: fixed;
+    z-index: 100;
+  }
+  .hp-ghost-title {
+    font-size: 2.5rem;
+    margin-top: 2rem;
+    letter-spacing: 5px;
+  }
+  .hp-features {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .hp-feature-card {
+    padding: 1.2rem;
+  }
+  .hp-tutorial-card {
+    flex-direction: column;
+  }
+  .hp-tutorial-cover {
+    width: 100%;
+    min-height: 60px;
+  }
+  .hp-tutorial-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .hp-tutorial-link {
+    margin-left: 0;
+  }
+  .hp-arrow {
+    display: none;
+  }
+  .hp-nav-icons {
+    gap: 1.2rem;
+  }
+  .hp-icon-btn svg {
+    width: 40px;
+    height: 40px;
+    padding: 9px;
+  }
+  .hp-icon-btn span {
+    font-size: 0.65rem;
+  }
+}

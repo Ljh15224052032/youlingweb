@@ -250,7 +250,7 @@ function Airdrop() {
           ) : filteredAirdrops.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.4)' }}>{t('airdrop.noData')}</div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1.5rem' }}>
               {filteredAirdrops.map(airdrop => (
                 <div
                   key={airdrop.id}

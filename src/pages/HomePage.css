@@ -7,17 +7,15 @@
   overflow-x: hidden;
   position: relative;
 }
-.hp-page-particles {
+.hp-particle-canvas {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 845px;
+  height: 659px;
   pointer-events: none;
-}
-.hp-page-particles canvas {
-  pointer-events: auto;
+  z-index: 100;
 }
 
 /* ========== 导航栏 ========== */
@@ -185,17 +183,6 @@
     rgba(191, 161, 74, 0.08) 0%,
     transparent 70%
   );
-  pointer-events: none;
-}
-.hp-hero-bg-svg {
-  position: absolute;
-  top: 60%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: auto;
-  opacity: 0.12;
-  z-index: 0;
   pointer-events: none;
 }
 
@@ -462,8 +449,9 @@
   }
 }
 @media (max-width: 768px) {
-  .hp-hero-bg-svg {
-    width: 280px;
+  .hp-particle-canvas {
+    width: 364px;
+    height: 286px;
   }
   .hp-nav {
     padding: 0 1.2rem;

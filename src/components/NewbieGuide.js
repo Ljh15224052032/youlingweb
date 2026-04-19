@@ -3,6 +3,7 @@ import './Components.css';
 import { supabase } from '../services/supabaseClient';
 import useUserStore from '../store/userStore';
 import { safeMarkdown, escapeHtml } from '../utils/sanitize';
+import { handleWechatLinkClick } from '../utils/wechatLink';
 import { useLang } from '../i18n/context';
 
 function NewbieGuide() {
@@ -252,6 +253,7 @@ function NewbieGuide() {
 
             <div
               className="docs-content"
+              onClick={handleWechatLinkClick}
               dangerouslySetInnerHTML={{ __html: safeMarkdown(selectedGuide.content || '') }}
             />
           </div>

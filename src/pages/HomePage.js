@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'particles.js';
 import { supabase } from '../services/supabaseClient';
 import { useLang } from '../i18n/context';
 import './HomePage.css';
@@ -100,36 +99,173 @@ function HomePage() {
       .then(({ data }) => { if (data) setGuides(data); });
   }, []);
 
+  const particleCanvasRef = useRef(null);
+
   useEffect(() => {
-    if (window.particlesJS && document.getElementById('hp-particles-js')) {
-      window.particlesJS('hp-particles-js', {
-        particles: {
-          number: { value: 40, density: { enable: true, value_area: 1200 } },
-          color: { value: '#bfa14a' },
-          shape: { type: 'circle' },
-          opacity: { value: 0.3, random: true },
-          size: { value: 2, random: true },
-          line_linked: { enable: true, distance: 150, color: '#bfa14a', opacity: 0.15, width: 1 },
-          move: { enable: true, speed: 1, direction: 'none', random: false, straight: false, out_mode: 'out' }
-        },
-        interactivity: {
-          detect_on: 'canvas',
-          events: {
-            onhover: { enable: true, mode: 'repulse' },
-            onclick: { enable: true, mode: 'push' },
-            resize: true
-          },
-          modes: {
-            repulse: { distance: 100, duration: 0.4 },
-            push: { particles_nb: 3 }
+    const canvas = particleCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const pathD = 'M116 0C127.331 0 138.282 1.62627 148.634 4.65527C155.871 3.24161 163.349 2.5 171 2.5C228.978 2.5 277.019 45.0344 285.626 100.601C292.038 101.401 297 106.871 297 113.5C297 119.737 292.607 124.948 286.746 126.208C282.779 186.679 232.475 234.5 171 234.5C159.669 234.5 148.717 232.873 138.365 229.844C131.128 231.257 123.651 232 116 232C51.935 232 0 180.065 0 116C3.8656e-07 51.935 51.935 3.8666e-07 116 0ZM157.276 7.94727L178.232 18.4248L186.689 24.8916L194.651 31.8594L209.095 46.7998L221.046 68.2129L229.511 91.1172L230.254 96.8145L231 102.541L231.499 114L230.502 136.916L223.534 159.811L212.083 181.22L199.142 197.147L182.221 211.58L149.779 227.552L148.243 228.308L149.944 228.497L172.506 231.004L172.566 230.996L195.066 227.996L195.107 227.99L195.147 227.978L208.147 223.978L208.175 223.97L208.201 223.958L220.701 218.458L220.725 218.447L220.746 218.436L232.246 211.936L232.271 211.921L232.294 211.904L243.326 203.881L253.875 193.332L253.894 193.309L262.894 181.809L262.913 181.784L262.929 181.757L271.929 166.757L271.953 166.716L271.97 166.671L277.97 150.171L277.98 150.142L277.987 150.11L280.487 139.11L280.491 139.097L280.493 139.082L281.5 133.041V127.276L281.333 127.127L279.892 125.837C276.477 124.7 273.692 122.185 272.196 118.952L272.021 118.795L272.038 118.599C271.37 117.033 271 115.31 271 113.5C271 107.193 275.491 101.935 281.45 100.75L278.483 89.374L278.479 89.3574L278.475 89.3418L274.475 77.3418L274.463 77.3105L269.963 66.3105L269.945 66.2666L269.919 66.2275L263.419 56.2275L263.413 56.2178L263.406 56.208L254.406 43.708L254.373 43.6621L254.331 43.626L241.331 32.126L241.313 32.1094L241.293 32.0947L226.793 21.5947L226.76 21.5713L226.724 21.5527L210.681 13.5312L210.635 13.5186L198.135 10.0186L198.126 10.0156L198.116 10.0137L185.616 7.01367L185.56 7H157.5L157.276 7.94727ZM148.434 9.57617C96.8968 19.629 58 65.0213 58 119.5C58 169.71 91.0405 212.203 136.565 226.424C188.103 216.371 227 170.979 227 116.5C227 66.2893 193.959 23.7965 148.434 9.57617ZM127 47.4814C139.912 45.6224 139.005 46.9739 139 46.9814L140 64.9814C140 64.9814 141.357 66.4751 142.5 66.9814C144.65 67.9336 147.627 68.6645 148.5 66.4814C150.5 61.4814 149.5 46.9814 149.5 46.9814H161.5C161.5 46.9814 160.72 59.7515 162.5 65.4814C163.806 69.6862 178.5 70.4815 182.5 73.4814C186.5 76.4814 190.857 80.623 192 87.4814C193.147 94.3645 189.5 101.981 185.5 106.481L182.5 109.481C182.29 111.487 189.296 113.742 191 114.981C196.492 118.976 197.996 127.955 198 127.981C198 127.981 198.5 139.481 195 145.481C190.452 153.278 186.07 155.071 178.5 158.481C171.653 161.566 160.006 161.981 160 161.981V181.981H148.5L147 179.981V165.481C147 163.981 146.5 163.481 145 162.481H138.5C137 163.481 137.5 164.981 137.5 166.481V181.981H127L125 179.981L124.5 164.481C124.5 162.981 123.5 161.981 122.5 161.481C121.5 160.981 103.5 159.981 103.5 159.981L101 158.481L102.5 146.981L114 145.981L115.5 143.981L117 86.4814C117 76.4862 103.512 77.9801 103.5 77.9814L101.5 76.4814V66.4814H125.5C128.001 60.1449 127.251 55.0941 127 47.4814ZM137.5 145.481L139.5 146.981H158C163.5 145.481 166.5 144.481 170.5 140.481C172.5 137.481 173 134.981 172.5 131.481C171 124.981 166.5 122.981 160 120.981C152 119.481 147 119.481 138.5 119.481L137.5 145.481ZM139 82.9814L138.5 106.481H158L164 102.981L166.5 100.981L167.5 98.4814L168 94.9814L167 89.9814L165.5 87.4814L163 84.9814C159.5 83.4814 157 82.4814 151.5 81.9814L139.5 80.9814L139 82.9814Z';
+
+    const svgW = 297, svgH = 235;
+    const SUPER = 6;
+    let isMobile = window.innerWidth < 768;
+    let PARTICLE_COUNT = isMobile ? 800 : 2500;
+    let REPEL_RADIUS = isMobile ? 0 : 80;
+    const REPEL_FORCE = 6;
+    let canvasW, canvasH, dpr;
+    let particles = [];
+    let mouseX = -9999, mouseY = -9999;
+    let time = 0;
+    let animId;
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      canvasW = rect.width;
+      canvasH = rect.height;
+      canvas.width = canvasW * dpr;
+      canvas.height = canvasH * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function sampleSVGPath(cb) {
+      const baseScale = Math.min(canvasW / svgW, canvasH / svgH) * 0.85;
+      const hiScale = baseScale * SUPER;
+      const hiW = Math.ceil(svgW * hiScale);
+      const hiH = Math.ceil(svgH * hiScale);
+      const svgStr = '<svg xmlns="http://www.w3.org/2000/svg" width="' + hiW + '" height="' + hiH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '"><path d="' + pathD + '" fill="#fff"/></svg>';
+      const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = function () {
+        const off = document.createElement('canvas');
+        off.width = hiW; off.height = hiH;
+        const offCtx = off.getContext('2d');
+        offCtx.drawImage(img, 0, 0, hiW, hiH);
+        URL.revokeObjectURL(url);
+        const imageData = offCtx.getImageData(0, 0, hiW, hiH);
+        const data = imageData.data;
+        const raw = [];
+        for (let y = 0; y < hiH; y++) {
+          for (let x = 0; x < hiW; x++) {
+            if (data[(y * hiW + x) * 4 + 3] > 128) raw.push({ x, y });
           }
-        },
-        retina_detect: true
+        }
+        const step = Math.max(1, Math.floor(raw.length / PARTICLE_COUNT));
+        const displayW = Math.ceil(svgW * baseScale);
+        const displayH = Math.ceil(svgH * baseScale);
+        const ox = (canvasW - displayW) / 2;
+        const oy = (canvasH - displayH) / 2;
+        const pts = [];
+        for (let i = 0; i < raw.length; i += step) {
+          pts.push({ x: raw[i].x / SUPER + ox, y: raw[i].y / SUPER + oy });
+        }
+        cb(pts);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); cb([]); };
+      img.src = url;
+    }
+
+    function initParticles() {
+      resizeCanvas();
+      sampleSVGPath(function (targets) {
+        particles = [];
+        if (!targets.length) return;
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          const t = targets[i % targets.length];
+          particles.push({
+            x: Math.random() * canvasW, y: Math.random() * canvasH,
+            tx: t.x, ty: t.y, vx: 0, vy: 0,
+            size: isMobile ? 1.2 : 1.5,
+            alpha: 0.6 + Math.random() * 0.4,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
       });
     }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvasW, canvasH);
+      time += 0.016;
+
+      // 旋转：6秒转一圈，停4秒，循环
+      const rotCycle = 10;
+      const rotActive = 6;
+      const cycleT = time % rotCycle;
+      const rotAngle = cycleT < rotActive ? (cycleT / rotActive) * Math.PI * 2 : 0;
+      const centerX = canvasW / 2;
+      const centerY = canvasH / 2;
+
+      if (rotAngle !== 0) {
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(rotAngle);
+        ctx.translate(-centerX, -centerY);
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const breathX = Math.sin(time * 0.8 + p.phase) * 1.5;
+        const breathY = Math.cos(time * 0.6 + p.phase * 1.3) * 1.5;
+        let targetX = p.tx + breathX;
+        let targetY = p.ty + breathY;
+        if (REPEL_RADIUS > 0) {
+          const dx = p.x - mouseX, dy = p.y - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < REPEL_RADIUS && dist > 0.1) {
+            const force = (REPEL_RADIUS - dist) / REPEL_RADIUS * REPEL_FORCE;
+            targetX += (dx / dist) * force * 10;
+            targetY += (dy / dist) * force * 10;
+          }
+        }
+        p.vx += (targetX - p.x) * 0.1;
+        p.vy += (targetY - p.y) * 0.1;
+        p.vx *= 0.82; p.vy *= 0.82;
+        p.x += p.vx; p.y += p.vy;
+        ctx.beginPath();
+        const breathSize = p.size * (1 + 0.3 * Math.sin(time * 1.2 + p.phase));
+        ctx.arc(p.x, p.y, breathSize, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(191,161,74,' + (p.alpha * 0.35).toFixed(2) + ')';
+        ctx.fill();
+      }
+      if (rotAngle !== 0) {
+        ctx.restore();
+      }
+
+      animId = requestAnimationFrame(animate);
+    }
+
+    // 鼠标追踪
+    function handleMouseMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    }
+    function handleMouseLeave() { mouseX = -9999; mouseY = -9999; }
+
+    if (!isMobile) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseleave', handleMouseLeave);
+    }
+
+    function handleResize() {
+      isMobile = window.innerWidth < 768;
+      PARTICLE_COUNT = isMobile ? 800 : 2500;
+      REPEL_RADIUS = isMobile ? 0 : 80;
+      initParticles();
+    }
+    window.addEventListener('resize', handleResize);
+
+    initParticles();
+    animate();
+
     return () => {
-      const el = document.getElementById('hp-particles-js');
-      if (el) el.innerHTML = '';
+      cancelAnimationFrame(animId);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -148,7 +284,8 @@ function HomePage() {
 
   return (
     <div className="homepage">
-      <div id="hp-particles-js" className="hp-page-particles" />
+      {/* Canvas 粒子背景 */}
+      <canvas ref={particleCanvasRef} className="hp-particle-canvas" />
       {/* 导航栏 */}
       <nav className="hp-nav">
         <div className="hp-nav-logo">GHOST <LogoIcon size={28} /></div>
@@ -164,15 +301,6 @@ function HomePage() {
 
       {/* Hero 区域 */}
       <section id="hero" className="hp-hero">
-        <svg className="hp-hero-bg-svg" viewBox="0 0 297 235" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M116 0C127.331 0 138.282 1.62627 148.634 4.65527C155.871 3.24161 163.349 2.5 171 2.5C228.978 2.5 277.019 45.0344 285.626 100.601C292.038 101.401 297 106.871 297 113.5C297 119.737 292.607 124.948 286.746 126.208C282.779 186.679 232.475 234.5 171 234.5C159.669 234.5 148.717 232.873 138.365 229.844C131.128 231.257 123.651 232 116 232C51.935 232 0 180.065 0 116C3.8656e-07 51.935 51.935 3.8666e-07 116 0ZM157.276 7.94727L178.232 18.4248L186.689 24.8916L194.651 31.8594L209.095 46.7998L221.046 68.2129L229.511 91.1172L230.254 96.8145L231 102.541L231.499 114L230.502 136.916L223.534 159.811L212.083 181.22L199.142 197.147L182.221 211.58L149.779 227.552L148.243 228.308L149.944 228.497L172.506 231.004L172.566 230.996L195.066 227.996L195.107 227.99L195.147 227.978L208.147 223.978L208.175 223.97L208.201 223.958L220.701 218.458L220.725 218.447L220.746 218.436L232.246 211.936L232.271 211.921L232.294 211.904L243.326 203.881L253.875 193.332L253.894 193.309L262.894 181.809L262.913 181.784L262.929 181.757L271.929 166.757L271.953 166.716L271.97 166.671L277.97 150.171L277.98 150.142L277.987 150.11L280.487 139.11L280.491 139.097L280.493 139.082L281.5 133.041V127.276L281.333 127.127L279.892 125.837C276.477 124.7 273.692 122.185 272.196 118.952L272.021 118.795L272.038 118.599C271.37 117.033 271 115.31 271 113.5C271 107.193 275.491 101.935 281.45 100.75L278.483 89.374L278.479 89.3574L278.475 89.3418L274.475 77.3418L274.463 77.3105L269.963 66.3105L269.945 66.2666L269.919 66.2275L263.419 56.2275L263.413 56.2178L263.406 56.208L254.406 43.708L254.373 43.6621L254.331 43.626L241.331 32.126L241.313 32.1094L241.293 32.0947L226.793 21.5947L226.76 21.5713L226.724 21.5527L210.681 13.5312L210.635 13.5186L198.135 10.0186L198.126 10.0156L198.116 10.0137L185.616 7.01367L185.56 7H157.5L157.276 7.94727ZM148.434 9.57617C96.8968 19.629 58 65.0213 58 119.5C58 169.71 91.0405 212.203 136.565 226.424C188.103 216.371 227 170.979 227 116.5C227 66.2893 193.959 23.7965 148.434 9.57617ZM127 47.4814C139.912 45.6224 139.005 46.9739 139 46.9814L140 64.9814C140 64.9814 141.357 66.4751 142.5 66.9814C144.65 67.9336 147.627 68.6645 148.5 66.4814C150.5 61.4814 149.5 46.9814 149.5 46.9814H161.5C161.5 46.9814 160.72 59.7515 162.5 65.4814C163.806 69.6862 178.5 70.4815 182.5 73.4814C186.5 76.4814 190.857 80.623 192 87.4814C193.147 94.3645 189.5 101.981 185.5 106.481L182.5 109.481C182.29 111.487 189.296 113.742 191 114.981C196.492 118.976 197.996 127.955 198 127.981C198 127.981 198.5 139.481 195 145.481C190.452 153.278 186.07 155.071 178.5 158.481C171.653 161.566 160.006 161.981 160 161.981V181.981H148.5L147 179.981V165.481C147 163.981 146.5 163.481 145 162.481H138.5C137 163.481 137.5 164.981 137.5 166.481V181.981H127L125 179.981L124.5 164.481C124.5 162.981 123.5 161.981 122.5 161.481C121.5 160.981 103.5 159.981 103.5 159.981L101 158.481L102.5 146.981L114 145.981L115.5 143.981L117 86.4814C117 76.4862 103.512 77.9801 103.5 77.9814L101.5 76.4814V66.4814H125.5C128.001 60.1449 127.251 55.0941 127 47.4814ZM137.5 145.481L139.5 146.981H158C163.5 145.481 166.5 144.481 170.5 140.481C172.5 137.481 173 134.981 172.5 131.481C171 124.981 166.5 122.981 160 120.981C152 119.481 147 119.481 138.5 119.481L137.5 145.481ZM139 82.9814L138.5 106.481H158L164 102.981L166.5 100.981L167.5 98.4814L168 94.9814L167 89.9814L165.5 87.4814L163 84.9814C159.5 83.4814 157 82.4814 151.5 81.9814L139.5 80.9814L139 82.9814Z" fill="url(#hp-hero-bg-grad)"/>
-          <defs>
-            <linearGradient id="hp-hero-bg-grad" x1="83" y1="8.49999" x2="166.5" y2="179" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#E8EB83"/>
-              <stop offset="1" stopColor="#BDA938"/>
-            </linearGradient>
-          </defs>
-        </svg>
         <div className="hp-hero-content">
           <h1 className="hp-hero-title">GHOST <span className="hp-hero-logo"><LogoIcon size={96} /></span></h1>
           <p className="hp-hero-subtitle">

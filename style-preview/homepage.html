@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GHOST 首页布局预览</title>
+<link rel="stylesheet" href="homepage.css">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="hp-container">
+
+  <!-- 左上角 SVG 图标 -->
+  <div class="hp-top-icon">
+    <svg width="36" height="36" viewBox="0 0 220 220" fill="none">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M75 109.5L13 19H71L108.5 73.5L146 19H197L134 109.5V187H169.5L202.5 166.5V206.5H75V109.5ZM101.5 82.5L90.5 99.5V194.5L81 199.5L79.5 99.5L31 28.5H66.5L101.5 82.5Z" fill="url(#top-grad)"/>
+      <defs><linearGradient id="top-grad" x1="202" y1="206" x2="108" y2="17" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="#FFC107"/></linearGradient></defs>
+    </svg>
+  </div>
+
+  <!-- 中央上部 GHOST 文字 -->
+  <h1 class="hp-ghost-title">GHOST</h1>
+
+  <!-- 全局粒子背景 Canvas（不随滑动移动） -->
+  <canvas class="hp-particle-canvas" id="particleCanvas"></canvas>
+
+  <!-- 隐藏的 SVG 用于路径采样 -->
+  <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+    <defs>
+      <path id="samplePath" d="M116 0C127.331 0 138.282 1.62627 148.634 4.65527C155.871 3.24161 163.349 2.5 171 2.5C228.978 2.5 277.019 45.0344 285.626 100.601C292.038 101.401 297 106.871 297 113.5C297 119.737 292.607 124.948 286.746 126.208C282.779 186.679 232.475 234.5 171 234.5C159.669 234.5 148.717 232.873 138.365 229.844C131.128 231.257 123.651 232 116 232C51.935 232 0 180.065 0 116C3.8656e-07 51.935 51.935 3.8666e-07 116 0ZM157.276 7.94727L178.232 18.4248L186.689 24.8916L194.651 31.8594L209.095 46.7998L221.046 68.2129L229.511 91.1172L230.254 96.8145L231 102.541L231.499 114L230.502 136.916L223.534 159.811L212.083 181.22L199.142 197.147L182.221 211.58L149.779 227.552L148.243 228.308L149.944 228.497L172.506 231.004L172.566 230.996L195.066 227.996L195.107 227.99L195.147 227.978L208.147 223.978L208.175 223.97L208.201 223.958L220.701 218.458L220.725 218.447L220.746 218.436L232.246 211.936L232.271 211.921L232.294 211.904L243.326 203.881L253.875 193.332L253.894 193.309L262.894 181.809L262.913 181.784L262.929 181.757L271.929 166.757L271.953 166.716L271.97 166.671L277.97 150.171L277.98 150.142L277.987 150.11L280.487 139.11L280.491 139.097L280.493 139.082L281.5 133.041V127.276L281.333 127.127L279.892 125.837C276.477 124.7 273.692 122.185 272.196 118.952L272.021 118.795L272.038 118.599C271.37 117.033 271 115.31 271 113.5C271 107.193 275.491 101.935 281.45 100.75L278.483 89.374L278.479 89.3574L278.475 89.3418L274.475 77.3418L274.463 77.3105L269.963 66.3105L269.945 66.2666L269.919 66.2275L263.419 56.2275L263.413 56.2178L263.406 56.208L254.406 43.708L254.373 43.6621L254.331 43.626L241.331 32.126L241.313 32.1094L241.293 32.0947L226.793 21.5947L226.76 21.5713L226.724 21.5527L210.681 13.5312L210.635 13.5186L198.135 10.0186L198.126 10.0156L198.116 10.0137L185.616 7.01367L185.56 7H157.5L157.276 7.94727ZM148.434 9.57617C96.8968 19.629 58 65.0213 58 119.5C58 169.71 91.0405 212.203 136.565 226.424C188.103 216.371 227 170.979 227 116.5C227 66.2893 193.959 23.7965 148.434 9.57617ZM127 47.4814C139.912 45.6224 139.005 46.9739 139 46.9814L140 64.9814C140 64.9814 141.357 66.4751 142.5 66.9814C144.65 67.9336 147.627 68.6645 148.5 66.4814C150.5 61.4814 149.5 46.9814 149.5 46.9814H161.5C161.5 46.9814 160.72 59.7515 162.5 65.4814C163.806 69.6862 178.5 70.4815 182.5 73.4814C186.5 76.4814 190.857 80.623 192 87.4814C193.147 94.3645 189.5 101.981 185.5 106.481L182.5 109.481C182.29 111.487 189.296 113.742 191 114.981C196.492 118.976 197.996 127.955 198 127.981C198 127.981 198.5 139.481 195 145.481C190.452 153.278 186.07 155.071 178.5 158.481C171.653 161.566 160.006 161.981 160 161.981V181.981H148.5L147 179.981V165.481C147 163.981 146.5 163.481 145 162.481H138.5C137 163.481 137.5 164.981 137.5 166.481V181.981H127L125 179.981L124.5 164.481C124.5 162.981 123.5 161.981 122.5 161.481C121.5 160.981 103.5 159.981 103.5 159.981L101 158.481L102.5 146.981L114 145.981L115.5 143.981L117 86.4814C117 76.4862 103.512 77.9801 103.5 77.9814L101.5 76.4814V66.4814H125.5C128.001 60.1449 127.251 55.0941 127 47.4814ZM137.5 145.481L139.5 146.981H158C163.5 145.481 166.5 144.481 170.5 140.481C172.5 137.481 173 134.981 172.5 131.481C171 124.981 166.5 122.981 160 120.981C152 119.481 147 119.481 138.5 119.481L137.5 145.481ZM139 82.9814L138.5 106.481H158L164 102.981L166.5 100.981L167.5 98.4814L168 94.9814L167 89.9814L165.5 87.4814L163 84.9814C159.5 83.4814 157 82.4814 151.5 81.9814L139.5 80.9814L139 82.9814Z" fill="#E8EB83"/>
+    </defs>
+  </svg>
+
+  <!-- 横向滑动区域 -->
+  <div class="hp-slider" id="slider">
+
+    <!-- 分区1: 主页 Hero -->
+    <div class="hp-slide" data-index="0">
+      <div class="hp-slide-content">
+        <p class="hp-hero-subtitle">Web3 社群 · 空投活动 · 交易教学</p>
+        <p class="hp-hero-desc">加入我们，获取最新的空投资讯、系统化的交易教学和专业的看盘工具</p>
+        <div class="hp-hero-buttons">
+          <button class="hp-btn-gold hp-btn-lg">立即加入</button>
+          <button class="hp-btn-outline hp-btn-lg">了解更多</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分区2: 核心功能 -->
+    <div class="hp-slide" data-index="1">
+      <div class="hp-slide-content">
+        <h2 class="hp-section-title">核心功能</h2>
+        <div class="hp-features">
+          <div class="hp-feature-card">
+            <div class="hp-feature-icon">
+              <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#bfa14a" opacity="0.2"/><path d="M12 6v6l4 2" stroke="#ffd700" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="#ffd700"/></svg>
+            </div>
+            <h3>空投活动</h3>
+            <p>精选优质空投项目，一站式参与，不错过每一个机会</p>
+          </div>
+          <div class="hp-feature-card">
+            <div class="hp-feature-icon">
+              <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="#bfa14a" opacity="0.2"/><path d="M8 8h8v2H8zm0 4h6v2H8z" fill="#ffd700"/></svg>
+            </div>
+            <h3>新手教学</h3>
+            <p>从零开始的 Web3 入门指南，手把手带你了解区块链世界</p>
+          </div>
+          <div class="hp-feature-card">
+            <div class="hp-feature-icon">
+              <svg width="40" height="40" fill="none" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2" fill="#bfa14a" opacity="0.2"/><path d="M9 7h6M9 11h6M9 15h3" stroke="#ffd700" stroke-width="2"/></svg>
+            </div>
+            <h3>合约教学</h3>
+            <p>系统化合约交易教学，掌握专业交易策略与风控技巧</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分区3: 新手教学 -->
+    <div class="hp-slide" data-index="2">
+      <div class="hp-slide-content">
+        <h2 class="hp-section-title">新手教学</h2>
+        <p class="hp-section-desc">精选入门教程，从零开始了解 Web3 世界</p>
+        <div class="hp-tutorials-list">
+          <div class="hp-tutorial-card">
+            <div class="hp-tutorial-cover"></div>
+            <div class="hp-tutorial-info">
+              <span class="hp-tutorial-tag">入门</span>
+              <h3>如何下载币安 App 并完成注册</h3>
+              <span class="hp-tutorial-link">阅读全文 →</span>
+            </div>
+          </div>
+          <div class="hp-tutorial-card">
+            <div class="hp-tutorial-cover"></div>
+            <div class="hp-tutorial-info">
+              <span class="hp-tutorial-tag">入门</span>
+              <h3>KYC 实名认证完整流程</h3>
+              <span class="hp-tutorial-link">阅读全文 →</span>
+            </div>
+          </div>
+          <div class="hp-tutorial-card">
+            <div class="hp-tutorial-cover"></div>
+            <div class="hp-tutorial-info">
+              <span class="hp-tutorial-tag">交易</span>
+              <h3>C2C 交易教程：买入你的第一个加密货币</h3>
+              <span class="hp-tutorial-link">阅读全文 →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分区4: CTA -->
+    <div class="hp-slide" data-index="3">
+      <div class="hp-slide-content">
+        <h2 class="hp-cta-title">准备好开始了吗？</h2>
+        <p class="hp-cta-desc">注册即可参与空投活动，获取最新教学资源</p>
+        <button class="hp-btn-gold hp-btn-lg">免费注册</button>
+        <div class="hp-social-icons">
+          <div class="hp-social-icon wechat">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05a6.42 6.42 0 01-.246-1.79c0-3.558 3.39-6.451 7.585-6.451.258 0 .509.025.764.042C16.672 4.627 13.034 2.188 8.691 2.188zm-2.35 4.477a.97.97 0 110 1.94.97.97 0 010-1.94zm5.321 0a.97.97 0 110 1.94.97.97 0 010-1.94zM23.997 15.39c0-3.248-3.236-5.882-7.229-5.882-3.992 0-7.228 2.634-7.228 5.882 0 3.248 3.236 5.882 7.228 5.882.79 0 1.55-.103 2.275-.289a.69.69 0 01.574.078l1.525.89a.26.26 0 00.133.044c.13 0 .232-.105.232-.236 0-.058-.023-.114-.039-.17l-.312-1.186a.472.472 0 01.171-.532c1.462-1.075 2.39-2.648 2.39-4.39zm-9.725-1.357a.78.78 0 110 1.56.78.78 0 010-1.56zm4.993 0a.78.78 0 110 1.56.78.78 0 010-1.56z"/></svg>
+          </div>
+          <div class="hp-social-icon official-account">
+            <svg viewBox="0 0 1024 1024" width="20" height="20"><path d="M849.92 51.2H174.08c-67.8656 0-122.88 55.0144-122.88 122.88v675.84c0 67.8656 55.0144 122.88 122.88 122.88h675.84c67.8656 0 122.88-55.0144 122.88-122.88V174.08c0-67.8656-55.0144-122.88-122.88-122.88z" fill="currentColor"/></svg>
+          </div>
+        </div>
+        <p class="hp-copyright">&copy; 2026 GHOST. All rights reserved.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 底部圆形图标按钮组 -->
+  <div class="hp-nav-icons">
+    <button class="hp-icon-btn active" data-target="0" title="首页">
+      <!-- 首页图标 -->
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
+        <path d="M9 21V12h6v9"/>
+      </svg>
+      <span>首页</span>
+    </button>
+    <button class="hp-icon-btn" data-target="1" title="功能">
+      <!-- 功能/应用图标 -->
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+      <span>功能</span>
+    </button>
+    <button class="hp-icon-btn" data-target="2" title="教学">
+      <!-- 教学/书本图标 -->
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2V3z"/>
+        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7V3z"/>
+      </svg>
+      <span>教学</span>
+    </button>
+    <button class="hp-icon-btn" data-target="3" title="注册">
+      <!-- 注册/用户图标 -->
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M19 8v4M21 10h-4"/>
+      </svg>
+      <span>注册</span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  /* ========== 滑动逻辑 ========== */
+  var slider = document.getElementById('slider');
+  var slides = slider.querySelectorAll('.hp-slide');
+  var dots = document.querySelectorAll('.hp-icon-btn');
+  var total = slides.length;
+  var current = 0;
+  var isAnimating = false;
+
+  function goTo(index) {
+    if (isAnimating || index === current || index < 0 || index >= total) return;
+    isAnimating = true;
+    current = index;
+    slider.style.transform = 'translateX(-' + (current * 100) + '%)';
+    dots.forEach(function(d, i) {
+      d.classList.toggle('active', i === current);
+    });
+    setTimeout(function() { isAnimating = false; }, 400);
+  }
+
+  dots.forEach(function(dot) {
+    dot.addEventListener('click', function() {
+      goTo(parseInt(this.getAttribute('data-target')));
+    });
+  });
+
+  var startX = 0, deltaX = 0;
+  slider.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    deltaX = 0;
+  }, { passive: true });
+  slider.addEventListener('touchmove', function(e) {
+    deltaX = e.touches[0].clientX - startX;
+  }, { passive: true });
+  slider.addEventListener('touchend', function() {
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX < 0) goTo(current + 1);
+      else goTo(current - 1);
+    }
+  });
+
+  var dragStartX = 0, dragging = false;
+  slider.addEventListener('mousedown', function(e) {
+    dragStartX = e.clientX;
+    dragging = true;
+    slider.style.cursor = 'grabbing';
+  });
+  document.addEventListener('mouseup', function(e) {
+    if (!dragging) return;
+    dragging = false;
+    slider.style.cursor = '';
+    var diff = e.clientX - dragStartX;
+    if (Math.abs(diff) > 60) {
+      if (diff < 0) goTo(current + 1);
+      else goTo(current - 1);
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowLeft') goTo(current - 1);
+    if (e.key === 'ArrowRight') goTo(current + 1);
+  });
+
+  var wheelTimer = null;
+  document.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    if (wheelTimer) return;
+    wheelTimer = setTimeout(function() { wheelTimer = null; }, 600);
+    if (e.deltaY > 0 || e.deltaX > 0) goTo(current + 1);
+    else if (e.deltaY < 0 || e.deltaX < 0) goTo(current - 1);
+  }, { passive: false });
+
+  /* ========== Canvas 粒子系统 ========== */
+  var canvas = document.getElementById('particleCanvas');
+  var ctx = canvas.getContext('2d');
+  var pathEl = document.getElementById('samplePath');
+
+  var isMobile = window.innerWidth < 768;
+  var PARTICLE_COUNT = isMobile ? 800 : 2500;
+  var REPEL_RADIUS = isMobile ? 0 : 80;
+  var REPEL_FORCE = 6;
+  var canvasW, canvasH, dpr;
+  var particles = [];
+  var mouseX = -9999, mouseY = -9999;
+  var time = 0;
+
+  function resizeCanvas() {
+    var rect = canvas.getBoundingClientRect();
+    dpr = window.devicePixelRatio || 1;
+    canvasW = rect.width;
+    canvasH = rect.height;
+    canvas.width = canvasW * dpr;
+    canvas.height = canvasH * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // 6倍超采样 SVG → Image → Canvas → 逐像素扫描
+  function sampleSVGPath(callback) {
+    var pathD = pathEl.getAttribute('d');
+    var svgW = 297, svgH = 235;
+    var SUPER = 6;
+    var baseScale = Math.min(canvasW / svgW, canvasH / svgH) * 0.85;
+    var hiScale = baseScale * SUPER;
+    var hiW = Math.ceil(svgW * hiScale);
+    var hiH = Math.ceil(svgH * hiScale);
+
+    var svgStr = '<svg xmlns="http://www.w3.org/2000/svg" width="' + hiW + '" height="' + hiH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">'
+      + '<path d="' + pathD + '" fill="#fff"/>'
+      + '</svg>';
+
+    var blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var img = new Image();
+    img.onload = function() {
+      var offCanvas = document.createElement('canvas');
+      offCanvas.width = hiW;
+      offCanvas.height = hiH;
+      var offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(img, 0, 0, hiW, hiH);
+      URL.revokeObjectURL(url);
+
+      var imageData = offCtx.getImageData(0, 0, hiW, hiH);
+      var data = imageData.data;
+      var rawPoints = [];
+      for (var y = 0; y < hiH; y++) {
+        for (var x = 0; x < hiW; x++) {
+          var idx = (y * hiW + x) * 4;
+          if (data[idx + 3] > 128) {
+            rawPoints.push({ x: x, y: y });
+          }
+        }
+      }
+
+      var step = Math.max(1, Math.floor(rawPoints.length / PARTICLE_COUNT));
+      var displayW = Math.ceil(svgW * baseScale);
+      var displayH = Math.ceil(svgH * baseScale);
+      var offsetX = (canvasW - displayW) / 2;
+      var offsetY = (canvasH - displayH) / 2;
+      var points = [];
+      for (var i = 0; i < rawPoints.length; i += step) {
+        points.push({
+          x: rawPoints[i].x / SUPER + offsetX,
+          y: rawPoints[i].y / SUPER + offsetY
+        });
+      }
+      callback(points);
+    };
+    img.onerror = function() {
+      URL.revokeObjectURL(url);
+      callback([]);
+    };
+    img.src = url;
+  }
+
+  function initParticles() {
+    resizeCanvas();
+    sampleSVGPath(function(targets) {
+      particles = [];
+      if (targets.length === 0) return;
+      for (var i = 0; i < PARTICLE_COUNT; i++) {
+        var t = targets[i % targets.length];
+        particles.push({
+          x: Math.random() * canvasW,
+          y: Math.random() * canvasH,
+          tx: t.x,
+          ty: t.y,
+          vx: 0,
+          vy: 0,
+          size: isMobile ? 1.2 : 1.5,
+          alpha: 0.6 + Math.random() * 0.4,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvasW, canvasH);
+    time += 0.016;
+    var breathAmp = 1.5;
+
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+
+      // 呼吸偏移
+      var breathX = Math.sin(time * 0.8 + p.phase) * breathAmp;
+      var breathY = Math.cos(time * 0.6 + p.phase * 1.3) * breathAmp;
+
+      var targetX = p.tx + breathX;
+      var targetY = p.ty + breathY;
+
+      // 鼠标排斥
+      if (REPEL_RADIUS > 0) {
+        var dx = p.x - mouseX;
+        var dy = p.y - mouseY;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < REPEL_RADIUS && dist > 0.1) {
+          var force = (REPEL_RADIUS - dist) / REPEL_RADIUS * REPEL_FORCE;
+          targetX += (dx / dist) * force * 10;
+          targetY += (dy / dist) * force * 10;
+        }
+      }
+
+      // 弹性回归
+      p.vx += (targetX - p.x) * 0.1;
+      p.vy += (targetY - p.y) * 0.1;
+      p.vx *= 0.82;
+      p.vy *= 0.82;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(191,161,74,' + (p.alpha * 0.35).toFixed(2) + ')';
+      ctx.fill();
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  // 鼠标位置追踪（相对于 canvas）
+  if (!isMobile) {
+    canvas.style.pointerEvents = 'auto';
+    var container = document.querySelector('.hp-container');
+    container.addEventListener('mousemove', function(e) {
+      var rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    });
+    container.addEventListener('mouseleave', function() {
+      mouseX = -9999;
+      mouseY = -9999;
+    });
+  }
+
+  initParticles();
+  animate();
+
+  window.addEventListener('resize', function() {
+    isMobile = window.innerWidth < 768;
+    PARTICLE_COUNT = isMobile ? 800 : 2500;
+    REPEL_RADIUS = isMobile ? 0 : 80;
+    initParticles();
+  });
+})();
+</script>
+
+</body>
+</html>

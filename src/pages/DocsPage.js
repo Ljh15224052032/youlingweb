@@ -510,7 +510,8 @@ function DocsPage() {
               gap: "0.5rem",
               color: "#ffd700",
               fontSize: "1.2rem",
-              fontWeight: 700,
+              fontWeight: 400,
+              fontFamily: "'Cinzel', serif",
               letterSpacing: "2px",
               cursor: "pointer",
             }}

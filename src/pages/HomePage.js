@@ -190,21 +190,6 @@ function HomePage() {
       ctx.clearRect(0, 0, canvasW, canvasH);
       time += 0.016;
 
-      // 旋转：6秒转一圈，停4秒，循环
-      const rotCycle = 10;
-      const rotActive = 6;
-      const cycleT = time % rotCycle;
-      const rotAngle = cycleT < rotActive ? (cycleT / rotActive) * Math.PI * 2 : 0;
-      const centerX = canvasW / 2;
-      const centerY = canvasH / 2;
-
-      if (rotAngle !== 0) {
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(rotAngle);
-        ctx.translate(-centerX, -centerY);
-      }
-
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         const breathX = Math.sin(time * 0.8 + p.phase) * 1.5;
@@ -230,10 +215,6 @@ function HomePage() {
         ctx.fillStyle = 'rgba(191,161,74,' + (p.alpha * 0.35).toFixed(2) + ')';
         ctx.fill();
       }
-      if (rotAngle !== 0) {
-        ctx.restore();
-      }
-
       animId = requestAnimationFrame(animate);
     }
 
@@ -286,6 +267,7 @@ function HomePage() {
     <div className="homepage">
       {/* Canvas 粒子背景 */}
       <canvas ref={particleCanvasRef} className="hp-particle-canvas" />
+      <div className="hp-particle-glow" />
       {/* 导航栏 */}
       <nav className="hp-nav">
         <div className="hp-nav-logo">GHOST <LogoIcon size={28} /></div>

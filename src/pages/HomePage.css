@@ -1,7 +1,7 @@
 /* ========== 落地页全局 ========== */
 .homepage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0d0d0f 0%, #1a1508 40%, #0d0d0f 100%);
+  background: linear-gradient(135deg, #0d0d0f 0%, #1d1508 40%, #0d0d0f 100%);
   background-attachment: fixed;
   color: #fff;
   overflow-x: hidden;
@@ -16,6 +16,22 @@
   height: 659px;
   pointer-events: none;
   z-index: 100;
+}
+.hp-particle-glow {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(
+    circle,
+    rgba(191, 161, 74, 0.08) 0%,
+    rgba(191, 161, 74, 0.03) 30%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 99;
 }
 
 /* ========== 导航栏 ========== */

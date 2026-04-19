@@ -18,6 +18,9 @@
 | SimpleBar | 自定义滚动条 |
 | bcryptjs | 密码哈希 |
 | marked / react-markdown | Markdown 渲染 |
+| DOMPurify | XSS 安全过滤 |
+| particles.js | 粒子动画效果 |
+| i18n（自建） | 中英文切换（Context + JSON） |
 
 ## 快速启动
 
@@ -92,10 +95,17 @@ REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
 - 完善指引（交易所注册链接）
 
 ### 落地页
-- Hero 区域 + 粒子动画
-- 功能亮点卡片
-- 新手教学链接
+- Hero 区域 + 全页粒子动画
+- 黑金渐变背景，霓虹发光卡片风格
+- 功能亮点卡片 + 新手教学长条卡片
+- 微信图标点击复制
 - 响应式设计（桌面 + 移动端抽屉导航）
+
+### 国际化 (i18n)
+- 自建轻量方案：React Context + JSON 翻译文件，零第三方依赖
+- 右下角 C/N 按钮一键切换中英文
+- 语言偏好存 localStorage，刷新保持
+- 覆盖所有页面和组件（文档中心除外）
 
 ## 目录结构
 
@@ -103,18 +113,26 @@ REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
 src/
 ├── pages/
 │   ├── HomePage.js          # 落地页
-│   └── HomePage.css
+│   ├── HomePage.css
+│   └── DocsPage.js          # 文档中心
 ├── components/
 │   ├── Airdrop.js            # 空投活动
 │   ├── NewbieGuide.js        # 新手知识
 │   ├── ContractTutorial.js   # 合约教学
 │   ├── PointsExchange.js     # 积分兑换
 │   ├── UserProfile.js        # 个人中心
+│   ├── LangToggle.js         # 中英文切换按钮
 │   └── Components.css        # 组件公共样式
+├── i18n/
+│   ├── context.js            # LanguageContext + Provider + useLang
+│   ├── zh.js                 # 中文翻译
+│   └── en.js                 # 英文翻译
 ├── services/
 │   └── supabaseClient.js     # Supabase 客户端
 ├── store/
 │   └── userStore.js          # Zustand 状态管理
+├── utils/
+│   └── sanitize.js           # DOMPurify XSS 过滤
 ├── App.js                    # 路由 + Dashboard 布局
 ├── App.css                   # Dashboard 样式
 ├── AuthContainer.js          # 认证页容器（粒子动画）

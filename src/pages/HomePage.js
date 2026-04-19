@@ -137,6 +137,15 @@ function HomePage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const copyWechat = () => {
+    navigator.clipboard.writeText('admiraltyz');
+    const tip = document.getElementById('wechat-copy-tip');
+    if (tip) {
+      tip.textContent = lang === 'zh' ? '已复制' : 'Copied';
+      setTimeout(() => { tip.textContent = t('home.wechatTip'); }, 1500);
+    }
+  };
+
   return (
     <div className="homepage">
       <div id="hp-particles-js" className="hp-page-particles" />
@@ -245,7 +254,7 @@ function HomePage() {
       {/* Footer */}
       <footer className="hp-footer">
         <div className="hp-social-icons">
-          <div className="hp-social-icon wechat" style={{ cursor: 'pointer' }} onClick={() => { navigator.clipboard.writeText('admiraltyz'); const tip = document.getElementById('wechat-copy-tip'); if (tip) { tip.textContent = lang === 'zh' ? '已复制' : 'Copied'; setTimeout(() => { tip.textContent = t('home.wechatTip'); }, 1500); } }}>
+          <div className="hp-social-icon wechat" style={{ cursor: 'pointer' }} onClick={copyWechat}>
             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 01.213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 00.167-.054l1.903-1.114a.864.864 0 01.717-.098 10.16 10.16 0 002.837.403c.276 0 .543-.027.811-.05a6.42 6.42 0 01-.246-1.79c0-3.558 3.39-6.451 7.585-6.451.258 0 .509.025.764.042C16.672 4.627 13.034 2.188 8.691 2.188zm-2.35 4.477a.97.97 0 110 1.94.97.97 0 010-1.94zm5.321 0a.97.97 0 110 1.94.97.97 0 010-1.94zM23.997 15.39c0-3.248-3.236-5.882-7.229-5.882-3.992 0-7.228 2.634-7.228 5.882 0 3.248 3.236 5.882 7.228 5.882.79 0 1.55-.103 2.275-.289a.69.69 0 01.574.078l1.525.89a.26.26 0 00.133.044c.13 0 .232-.105.232-.236 0-.058-.023-.114-.039-.17l-.312-1.186a.472.472 0 01.171-.532c1.462-1.075 2.39-2.648 2.39-4.39zm-9.725-1.357a.78.78 0 110 1.56.78.78 0 010-1.56zm4.993 0a.78.78 0 110 1.56.78.78 0 010-1.56z"/></svg>
             <span id="wechat-copy-tip" className="hp-social-tooltip">{t('home.wechatTip')}</span>
           </div>

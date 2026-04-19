@@ -386,3 +386,62 @@
 - 消除外部 CDN 依赖
 
 ---
+
+## [2026-04-19] i18n 国际化 + 首页视觉升级
+
+**目标**：添加中英文切换功能，首页视觉风格全面升级
+
+**改动文件**：
+
+| 文件 | 操作 | 说明 |
+|---|---|---|
+| `src/i18n/context.js` | 新建 | LanguageContext + Provider + useLang hook，语言存 localStorage |
+| `src/i18n/zh.js` | 新建 | 中文翻译（~200+ 条，按页面/组件分组） |
+| `src/i18n/en.js` | 新建 | 英文翻译（对应中文翻译） |
+| `src/components/LangToggle.js` | 新建 | 右下角 C/N 切换按钮，霓虹发光风格 |
+| `src/components/LangToggle.css` | 新建 | 切换按钮样式 |
+| `src/App.js` | 修改 | 包裹 LanguageProvider，导航标签国际化，LangToggle 挂载 |
+| `src/pages/HomePage.js` | 修改 | 全部硬编码中文替换为 t()，打字机效果重写，粒子改为全页覆盖，微信图标点击复制 |
+| `src/pages/HomePage.css` | 修改 | 黑金渐变背景、导航栏黑金风格、功能/教学卡片霓虹发光、教学区长条卡片布局 |
+| `src/Login.js` | 修改 | 所有中文替换为 t('login.xxx') |
+| `src/Register.js` | 修改 | 所有中文替换为 t('register.xxx') |
+| `src/ForgotPassword.js` | 修改 | 所有中文替换为 t('forgot.xxx') |
+| `src/components/Airdrop.js` | 修改 | ~30+ 处中文替换为 t('airdrop.xxx') |
+| `src/components/NewbieGuide.js` | 修改 | ~9 处中文替换为 t('newbie.xxx') |
+| `src/components/ContractTutorial.js` | 修改 | ~15 处中文替换为 t('contract.xxx') |
+| `src/components/UserProfile.js` | 修改 | ~50+ 处中文替换为 t('profile.xxx') |
+| `src/components/PointsExchange.js` | 修改 | ~40+ 处中文替换为 t('pointsExchange.xxx') |
+| `src/Login.css` | 修改 | glass-card 霓虹发光风格 |
+| `src/components/Components.css` | 修改 | stat-card 霓虹发光、空投网格 5 列 |
+
+**关键改动**：
+
+- **i18n 架构**：自建轻量方案（React Context + JSON），零第三方依赖，`t('key.path')` 点分路径取值
+- **语言切换**：右下角固定 C/N 按钮，点击切换中英文，刷新保持（localStorage）
+- **打字机效果**：重写为 useEffect + cleanup，语言切换时正确重置
+- **首页背景**：黑金渐变（#0d0d0f → #1a1508 → #0d0d0f），固定不滚动
+- **粒子效果**：从 Hero 区域改为全页覆盖（fixed 定位），降低密度（40 粒子）
+- **导航栏**：黑金渐变半透明背景 + 金色边框发光
+- **卡片风格**：功能卡片和教学卡片统一霓虹发光（box-shadow 多层金色光晕）
+- **教学区布局**：卡片改为横向长条（封面左+文字右），"阅读全文"右下角对齐
+- **移动端适配**：教学区标题 order:-1 排到卡片上方
+- **微信图标**：点击复制微信号，tooltip 显示"已复制"
+
+**i18n 翻译覆盖**：
+
+| 模块 | 翻译条目数 |
+|---|---|
+| home（首页） | ~20 |
+| nav（导航） | 6 |
+| login（登录） | ~14 |
+| register（注册） | ~12 |
+| forgot（忘记密码） | ~12 |
+| airdrop（空投活动） | ~30 |
+| newbie（新手知识） | ~8 |
+| contract（合约教学） | ~10 |
+| profile（个人中心） | ~40 |
+| pointsExchange（积分兑换） | ~35 |
+
+**暂未翻译**：DocsPage.js（文档内容来自数据库，后续单独处理）
+
+---

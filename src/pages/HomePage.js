@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../services/supabaseClient';
 import { useLang } from '../i18n/context';
 import './HomePage.css';
 
@@ -81,7 +80,6 @@ const tutorials = [];
 function HomePage() {
   const navigate = useNavigate();
   const { lang, t } = useLang();
-  const [guides, setGuides] = useState([]);
 
   const featureKeys = ['Airdrop', 'Newbie', 'Contract'];
   const features = featureKeys.map((key, i) => ({
@@ -89,15 +87,6 @@ function HomePage() {
     title: t(`home.feature${key}`),
     desc: t(`home.feature${key}Desc`),
   }));
-
-  useEffect(() => {
-    supabase
-      .from('newbie_guides')
-      .select('id, title, category, cover_image')
-      .order('created_at', { ascending: false })
-      .limit(3)
-      .then(({ data }) => { if (data) setGuides(data); });
-  }, []);
 
   const leftTrackRef = useRef(null);
   const rightTrackRef = useRef(null);
@@ -253,37 +242,26 @@ function HomePage() {
         </div>
       </section>
 
-      {/* 新手教学 */}
-      <section id="tutorials" className="hp-section hp-section-dark">
-        <div className="hp-tutorials-layout">
-          <div className="hp-tutorials-cards">
-            {guides.length > 0 ? guides.map((g) => (
-              <div
-                className="hp-tutorial-card"
-                key={g.id}
-                style={{ cursor: 'pointer' }}
-                onClick={() => navigate('/docs')}
-              >
-                {g.cover_image && (
-                  <div className="hp-tutorial-cover" style={{ backgroundImage: `url(${g.cover_image})` }} />
-                )}
-                <div className="hp-tutorial-info">
-                  {g.category && <span className="hp-tutorial-tag">{g.category}</span>}
-                  <h3>{g.title}</h3>
-                  <span className="hp-tutorial-link">{t('home.readMore')}</span>
-                </div>
+      {/* 学习 Banner */}
+      <section className="hp-banner-section">
+        <div className="hp-banner-wrap">
+          <div className="hp-banner-card">
+            <img src="/images/web3-abstract.jpg" alt="" className="hp-banner-img" />
+            <div className="hp-banner-gradient" />
+            <div className="hp-banner-content">
+              <div className="hp-banner-text">
+                <h3 className="hp-banner-title">
+                  {t('home.bannerTitle')} <span className="hp-banner-highlight">{t('home.bannerHighlight')}</span>
+                </h3>
+                <p className="hp-banner-desc">{t('home.bannerDesc')}</p>
+                <button className="hp-banner-btn" onClick={() => navigate('/docs')}>
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                    <path d="M5 3l14 9-14 9V3z" fill="currentColor" />
+                  </svg>
+                  {t('home.startLearning')}
+                </button>
               </div>
-            )) : (
-              <div className="hp-tutorial-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/docs')}>
-                <h3>{t('home.defaultTutorialTitle')}</h3>
-                <p>{t('home.defaultTutorialDesc')}</p>
-                <span className="hp-tutorial-link">{t('home.viewTutorial')}</span>
-              </div>
-            )}
-          </div>
-          <div className="hp-tutorials-intro">
-            <h2 className="hp-section-title">{t('home.sectionTutorials')}</h2>
-            <p className="hp-section-desc">{t('home.tutorialsDesc')}</p>
+            </div>
           </div>
         </div>
       </section>

@@ -15,11 +15,9 @@
 | Zustand + persist | 状态管理 + 本地持久化 |
 | Supabase | 数据库 + 存储 + 认证（BaaS） |
 | SweetAlert2 | 弹窗交互 |
-| SimpleBar | 自定义滚动条 |
 | bcryptjs | 密码哈希 |
-| marked / react-markdown | Markdown 渲染 |
+| marked | Markdown 渲染 |
 | DOMPurify | XSS 安全过滤 |
-| particles.js | 粒子动画效果 |
 | i18n（自建） | 中英文切换（Context + JSON） |
 
 ## 快速启动
@@ -95,17 +93,27 @@ REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
 - 完善指引（交易所注册链接）
 
 ### 落地页
-- Hero 区域 + 全页粒子动画
-- 黑金渐变背景，霓虹发光卡片风格
-- 功能亮点卡片 + 新手教学长条卡片
+- Hero 区域 + PNG 背景图 + 径向发光
+- 黑金渐变背景，毛玻璃卡片风格
+- 功能亮点卡片 + 学习 Banner 横幅（渐变文字 + 开始学习按钮）
+- 双向无限滚动字幕墙（requestAnimationFrame 驱动，hover 平滑减速）
 - 微信图标点击复制
+- GHOST 品牌文字统一 Cinzel 字体
 - 响应式设计（桌面 + 移动端抽屉导航）
+
+### 文档中心（策略文档页）
+- 双视图切换：列表页（Banner + 分类筛选 + 双列卡片网格）/ 详情页
+- Banner：membership-card.jpg + 渐变遮罩 + Cinzel 标题
+- 毛玻璃卡片：图标 + 标题 + 摘要 + 分类标签，hover 金色光晕
+- 同分类上一篇/下一篇导航
+- 图片灯箱：滚轮缩放、拖拽移动、双击还原、触摸手势
+- 微信浏览器外部链接拦截提示
 
 ### 国际化 (i18n)
 - 自建轻量方案：React Context + JSON 翻译文件，零第三方依赖
 - 右下角 C/N 按钮一键切换中英文
 - 语言偏好存 localStorage，刷新保持
-- 覆盖所有页面和组件（文档中心除外）
+- 覆盖所有页面和组件
 
 ## 目录结构
 
@@ -114,7 +122,8 @@ src/
 ├── pages/
 │   ├── HomePage.js          # 落地页
 │   ├── HomePage.css
-│   └── DocsPage.js          # 文档中心
+│   ├── DocsPage.js          # 文档中心
+│   └── DocsPage.css
 ├── components/
 │   ├── Airdrop.js            # 空投活动
 │   ├── NewbieGuide.js        # 新手知识
@@ -132,10 +141,11 @@ src/
 ├── store/
 │   └── userStore.js          # Zustand 状态管理
 ├── utils/
-│   └── sanitize.js           # DOMPurify XSS 过滤
+│   ├── sanitize.js           # DOMPurify XSS 过滤
+│   └── wechatLink.js         # 微信浏览器链接拦截
 ├── App.js                    # 路由 + Dashboard 布局
 ├── App.css                   # Dashboard 样式
-├── AuthContainer.js          # 认证页容器（粒子动画）
+├── AuthContainer.js          # 认证页容器
 ├── Login.js / Register.js    # 登录/注册
 ├── ForgotPassword.js         # 找回密码
 └── index.js                  # 入口

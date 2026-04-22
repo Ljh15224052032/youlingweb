@@ -17,6 +17,8 @@ export default {
     featureContract: 'Contract Trading',
     featureContractDesc: 'Systematic contract trading tutorials, master professional strategies and risk management',
     sectionTutorials: 'Tutorials',
+    marqueeRow1: 'Blockchain   Decentralized   Smart Contract   Airdrop   DeFi   NFT   Web3   Wallet   Private Key   Public Chain   Gas Fee   Liquidity   Staking   Hashrate   DAO   Zero Knowledge Proof   Cross-chain Bridge   Node   Consensus   Layer2   Tokenomics   On-chain Governance   Lightning Network   Oracle   Fragmentation   Mint   Merkle Tree   Asymmetric Encryption   Distributed Ledger',
+    marqueeRow2: 'Distributed Ledger   Asymmetric Encryption   Merkle Tree   Mint   Fragmentation   Oracle   Lightning Network   On-chain Governance   Tokenomics   Layer2   Consensus   Node   Cross-chain Bridge   Zero Knowledge Proof   DAO   Hashrate   Staking   Liquidity   Gas Fee   Public Chain   Private Key   Wallet   Web3   NFT   DeFi   Airdrop   Smart Contract   Decentralized   Blockchain',
     tutorialsDesc: 'Selected beginner tutorials, explore the Web3 world from zero',
     readMore: 'Read More →',
     defaultTutorialTitle: 'Complete Beginner Tutorial',
@@ -293,6 +295,16 @@ export default {
     pointsUnit: 'Points',
     stock: 'Stock',
     moreWays: 'More ways to earn points coming soon',
+  },
+
+  docs: {
+    bannerTitle: 'GHOST Strategy Docs',
+    bannerDesc: 'Systematic trading strategy guides from beginner to advanced',
+    backToHome: '← Home',
+    backToList: 'Back to Docs',
+    all: 'All',
+    prevDoc: '← Previous',
+    nextDoc: 'Next →',
   },
 
   lang: {

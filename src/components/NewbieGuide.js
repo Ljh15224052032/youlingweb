@@ -139,7 +139,31 @@ function NewbieGuide() {
   );
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 120px)' }}>
+    <div style={{ display: 'flex', height: 'calc(100vh - 120px)', position: 'relative' }}>
+      {/* 背景图 + 渐变融合 */}
+      <img
+        src="/images/membership-card.jpg"
+        alt=""
+        style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: 0.06,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.9) 60%, #18181a 100%)',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }}
+      />
       {/* 移动端遮罩 */}
       {mobileMenuOpen && (
         <div
@@ -164,10 +188,10 @@ function NewbieGuide() {
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
-          position: mobileMenuOpen ? 'fixed' : undefined,
+          position: mobileMenuOpen ? 'fixed' : 'relative',
           left: mobileMenuOpen ? 0 : undefined,
           top: mobileMenuOpen ? 0 : undefined,
-          zIndex: mobileMenuOpen ? 100 : undefined,
+          zIndex: mobileMenuOpen ? 100 : 2,
           height: mobileMenuOpen ? '100%' : undefined,
         }}
       >
@@ -188,7 +212,7 @@ function NewbieGuide() {
       </aside>
 
       {/* 右侧内容 */}
-      <main style={{ flex: 1, minWidth: 0, overflowY: 'scroll', scrollbarWidth: 'none' }}
+      <main style={{ flex: 1, minWidth: 0, overflowY: 'scroll', scrollbarWidth: 'none', position: 'relative', zIndex: 2 }}
         className="docs-content-scroll">
         {/* 移动端汉堡按钮 + 当前标题 */}
         <div className="nb-mobile-header">

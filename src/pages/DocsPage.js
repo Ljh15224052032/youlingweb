@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import SimpleBar from "simplebar-react";
-import "simplebar-react/dist/simplebar.min.css";
 import Swal from "sweetalert2";
 import { safeMarkdown } from "../utils/sanitize";
 import { handleWechatLinkClick } from "../utils/wechatLink";
+import { useLang } from "../i18n/context";
+import "./DocsPage.css";
 
+// ── 文档数据 ──────────────────────────────
 const docs = [
   {
     id: "download-binance",
@@ -243,7 +244,7 @@ https://www.binance.com/zh-CN/support/faq/%E5%85%85%E5%80%BC%E4%B8%8E%E6%8F%90%E
     title: "网格机器人",
     category: "交易所教程",
     content: `
-    
+
 # 网格机器人
 
 ![网格机器人1](/images/grid-bot-1.jpg)
@@ -254,28 +255,38 @@ https://www.binance.com/zh-CN/support/faq/%E5%85%85%E5%80%BC%E4%B8%8E%E6%8F%90%E
   },
 ];
 
-const categories = [...new Set(docs.map((d) => d.category))];
+// ── SVG 图标 ──────────────────────────────
+const FileTextIcon = () => (
+  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+    <rect x="6" y="3" width="12" height="18" rx="2" fill="rgba(191,161,74,0.15)" />
+    <path d="M9 7h6M9 11h6M9 15h3" stroke="#ffd700" strokeWidth="2" />
+  </svg>
+);
 
-const sidebarGroups = categories.map((cat) => ({
-  category: cat,
-  items: docs.filter((d) => d.category === cat),
-}));
+const ArrowLeftIcon = () => (
+  <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+    <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
+const ChevronRightIcon = () => (
+  <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+    <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// ── 工具函数 ──────────────────────────────
+const getSummary = (content) =>
+  content
+    .replace(/[#*>`\[\]!()|]/g, "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\n+/g, " ")
+    .trim()
+    .slice(0, 100);
+
+// ── 文档内容组件（含灯箱） ────────────────
 function DocsContent({ doc }) {
-  if (!doc) {
-    return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "4rem 2rem",
-          color: "rgba(255,255,255,0.3)",
-        }}
-      >
-        <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📖</div>
-        <p>选择左侧文档开始阅读</p>
-      </div>
-    );
-  }
+  if (!doc) return null;
 
   const html = safeMarkdown(doc.content);
 
@@ -306,11 +317,11 @@ function DocsContent({ doc }) {
     Swal.fire({
       html: `
         <div style="position:relative;display:flex;align-items:center;justify-content:center;height:80vh;overflow:hidden">
-          <button id="docs-lightbox-prev" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:2;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index > 0 ? "block" : "none"}">‹</button>
+          <button id="docs-lightbox-prev" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:2;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index > 0 ? "block" : "none"}">&#8249;</button>
           <div id="docs-lightbox-wrap" style="overflow:hidden;max-width:100%;max-height:100%;display:flex;align-items:center;justify-content:center;position:relative;width:100%;height:100%">
             <img id="docs-lightbox-img" src="${images[index].src}" data-index="${index}" data-scale="1" draggable="false" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;transition:none;cursor:grab;user-select:none" />
           </div>
-          <button id="docs-lightbox-next" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:2;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index < images.length - 1 ? "block" : "none"}">›</button>
+          <button id="docs-lightbox-next" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:2;background:rgba(191,161,74,0.15);border:none;color:#ffd700;font-size:2rem;padding:0.5rem 1rem;cursor:pointer;border-radius:8px;display:${index < images.length - 1 ? "block" : "none"}">&#8250;</button>
           <div id="docs-lightbox-counter" style="position:absolute;bottom:-30px;color:rgba(255,255,255,0.5);font-size:0.85rem">${images.length > 1 ? `${index + 1} / ${images.length}` : ""}</div>
           <div id="docs-lightbox-hint" style="position:absolute;top:-25px;color:rgba(255,255,255,0.3);font-size:0.75rem">滚轮缩放 · 拖拽移动 · 双击还原</div>
         </div>
@@ -323,26 +334,18 @@ function DocsContent({ doc }) {
       didOpen: () => {
         const img = document.getElementById("docs-lightbox-img");
         let scale = 1;
-        let tx = 0,
-          ty = 0;
-        let dragging = false,
-          startX,
-          startY;
+        let tx = 0, ty = 0;
+        let dragging = false, startX, startY;
 
         const applyTransform = () => {
           img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
         };
 
         const resetView = () => {
-          scale = 1;
-          tx = 0;
-          ty = 0;
-          img.style.maxWidth = "100%";
-          img.style.maxHeight = "100%";
+          scale = 1; tx = 0; ty = 0;
           applyTransform();
         };
 
-        // 滚轮缩放
         img.addEventListener("wheel", (e) => {
           e.preventDefault();
           const delta = e.deltaY > 0 ? 0.9 : 1.1;
@@ -350,7 +353,6 @@ function DocsContent({ doc }) {
           applyTransform();
         });
 
-        // 拖拽
         img.addEventListener("mousedown", (e) => {
           if (scale <= 1) return;
           dragging = true;
@@ -369,16 +371,11 @@ function DocsContent({ doc }) {
           img.style.cursor = scale > 1 ? "grab" : "zoom-in";
         });
 
-        // 双击还原
         img.addEventListener("dblclick", () => resetView());
 
-        // 翻页时重置
-        const origShowImage = showImage;
         const showImageWithReset = (i) => {
-          origShowImage(i);
-          scale = 1;
-          tx = 0;
-          ty = 0;
+          showImage(i);
+          scale = 1; tx = 0; ty = 0;
           applyTransform();
         };
 
@@ -391,7 +388,6 @@ function DocsContent({ doc }) {
           if (cur < images.length - 1) showImageWithReset(cur + 1);
         };
 
-        // 触摸缩放 + 双指拖拽支持
         let lastTouchDist = 0;
         let touchDragging = false;
         let touchStartX = 0, touchStartY = 0;
@@ -449,331 +445,178 @@ function DocsContent({ doc }) {
   );
 }
 
+// ── 共享 Header ────────────────────────────
+function DocsHeader({ navigate, t }) {
+  return (
+    <header className="docs-header">
+      <div className="docs-header-left">
+        <div className="docs-logo" onClick={() => navigate("/")}>
+          GHOST
+        </div>
+      </div>
+      <button className="docs-back-home" onClick={() => navigate("/")}>
+        {t("docs.backToHome")}
+      </button>
+    </header>
+  );
+}
+
+// ── 主页面组件 ──────────────────────────────
 function DocsPage() {
   const navigate = useNavigate();
   const { docId } = useParams();
-  const currentDoc = docs.find((d) => d.id === docId) || docs[0];
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useLang();
+  const [activeCategory, setActiveCategory] = useState(undefined);
 
-  return (
-    <div
-      style={{
-        height: "100vh",
-        overflow: "hidden",
-        background: "#181a20",
-        color: "#fff",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {/* 顶部栏 */}
-      <header
-        style={{
-          height: "56px",
-          padding: "0 1.5rem",
-          background: "rgba(24,24,26,0.95)",
-          borderBottom: "1px solid rgba(191,161,74,0.2)",
-          backdropFilter: "blur(12px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "sticky",
-          top: 0,
-          zIndex: 50,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            style={{
-              display: "none",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "4px",
-            }}
-            className="docs-mobile-menu-btn"
-          >
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-              <path
-                d="M4 6h16M4 12h16M4 18h16"
-                stroke="#ffd700"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              color: "#ffd700",
-              fontSize: "1.2rem",
-              fontWeight: 400,
-              fontFamily: "'Cinzel', serif",
-              letterSpacing: "2px",
-              cursor: "pointer",
-            }}
-            onClick={() => navigate("/")}
-          >
-            <span>📖</span> GHOST 文档中心
+  const selectedDoc = docId ? docs.find((d) => d.id === docId) : null;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [docId]);
+
+  const categories = [...new Set(docs.map((d) => d.category))];
+  const filteredDocs = activeCategory
+    ? docs.filter((d) => d.category === activeCategory)
+    : docs;
+
+  // ── 视图 B：文档详情 ────────────────────
+  if (docId && selectedDoc) {
+    const sameCategoryDocs = docs.filter((d) => d.category === selectedDoc.category);
+    const currentIndex = sameCategoryDocs.findIndex((d) => d.id === selectedDoc.id);
+    const prevDoc = currentIndex > 0 ? sameCategoryDocs[currentIndex - 1] : null;
+    const nextDoc = currentIndex < sameCategoryDocs.length - 1 ? sameCategoryDocs[currentIndex + 1] : null;
+
+    return (
+      <div className="docs-page docs-detail-page">
+        <DocsHeader navigate={navigate} t={t} />
+
+        <div className="docs-detail-body">
+          <img
+            src="/images/membership-card.jpg"
+            alt=""
+            className="docs-bg-img"
+          />
+          <div className="docs-bg-overlay" />
+
+          <div className="docs-detail-wrap">
+            <button
+              className="docs-back-link"
+              onClick={() => navigate("/docs")}
+            >
+              <ArrowLeftIcon /> {t("docs.backToList")}
+            </button>
+
+            <div className="docs-detail-meta">
+              <span className="docs-detail-category">
+                {selectedDoc.category}
+              </span>
+            </div>
+
+            <h1 className="docs-detail-title">{selectedDoc.title}</h1>
+
+            <article className="docs-detail-article">
+              <DocsContent doc={selectedDoc} />
+            </article>
+
+            {/* 上下篇导航 */}
+            <div className="docs-nav-row">
+              {prevDoc ? (
+                <button
+                  className="docs-nav-btn prev"
+                  onClick={() => navigate(`/docs/${prevDoc.id}`)}
+                >
+                  <span className="docs-nav-label">{t("docs.prevDoc")}</span>
+                  <span className="docs-nav-title">{prevDoc.title}</span>
+                </button>
+              ) : (
+                <div className="docs-nav-spacer" />
+              )}
+              {nextDoc ? (
+                <button
+                  className="docs-nav-btn next"
+                  onClick={() => navigate(`/docs/${nextDoc.id}`)}
+                >
+                  <span className="docs-nav-label">{t("docs.nextDoc")}</span>
+                  <span className="docs-nav-title">{nextDoc.title}</span>
+                </button>
+              ) : (
+                <div className="docs-nav-spacer" />
+              )}
+            </div>
           </div>
         </div>
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            background: "rgba(191,161,74,0.1)",
-            border: "1px solid rgba(191,161,74,0.3)",
-            color: "#bfa14a",
-            padding: "0.4rem 1rem",
-            borderRadius: "8px",
-            fontSize: "0.85rem",
-            cursor: "pointer",
-          }}
-        >
-          ← 返回首页
-        </button>
-      </header>
+      </div>
+    );
+  }
 
-      <div style={{ display: "flex", flex: 1 }}>
-        {/* 移动端遮罩 */}
-        {mobileMenuOpen && (
-          <div
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "rgba(0,0,0,0.5)",
-              zIndex: 90,
-            }}
-          />
-        )}
+  // ── 视图 A：文档列表 ────────────────────
+  return (
+    <div className="docs-page">
+      <DocsHeader navigate={navigate} t={t} />
 
-        {/* 左侧目录 */}
-        <aside
-          className="docs-sidebar"
-          style={{
-            width: "280px",
-            minHeight: 0,
-            borderRight: "1px solid rgba(191,161,74,0.1)",
-            background: "rgba(20,20,24,0.6)",
-            position: mobileMenuOpen ? "fixed" : "relative",
-            left: mobileMenuOpen ? 0 : undefined,
-            top: mobileMenuOpen ? "56px" : undefined,
-            zIndex: mobileMenuOpen ? 100 : undefined,
-            height: mobileMenuOpen ? "calc(100vh - 56px)" : undefined,
-            display: mobileMenuOpen ? "block" : undefined,
-          }}
-        >
-          <SimpleBar style={{ height: "calc(100vh - 56px)" }}>
-            <div style={{ padding: "1.5rem 0" }}>
-              {sidebarGroups.map((group) => (
-                <div key={group.category} style={{ marginBottom: "1.5rem" }}>
-                  <div
-                    style={{
-                      padding: "0 1.5rem",
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                      color: "rgba(255,255,255,0.3)",
-                      letterSpacing: "2px",
-                      textTransform: "uppercase",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    {group.category}
-                  </div>
-                  {group.items.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => {
-                        navigate(`/docs/${item.id}`);
-                        setMobileMenuOpen(false);
-                      }}
-                      style={{
-                        padding: "0.6rem 1.5rem",
-                        cursor: "pointer",
-                        fontSize: "0.9rem",
-                        color:
-                          currentDoc?.id === item.id
-                            ? "#ffd700"
-                            : "rgba(255,255,255,0.6)",
-                        background:
-                          currentDoc?.id === item.id
-                            ? "rgba(191,161,74,0.1)"
-                            : "transparent",
-                        borderRight:
-                          currentDoc?.id === item.id
-                            ? "3px solid #ffd700"
-                            : "3px solid transparent",
-                        transition: "all 0.2s",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (currentDoc?.id !== item.id) {
-                          e.currentTarget.style.background =
-                            "rgba(191,161,74,0.05)";
-                          e.currentTarget.style.color = "#bfa14a";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (currentDoc?.id !== item.id) {
-                          e.currentTarget.style.background = "transparent";
-                          e.currentTarget.style.color = "rgba(255,255,255,0.6)";
-                        }
-                      }}
-                    >
-                      {item.title}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </SimpleBar>
-        </aside>
-
-        {/* 右侧内容 */}
-        <main style={{ flex: 1, minWidth: 0 }}>
-          <div className="docs-content-scroll" style={{ height: "calc(100vh - 56px)", overflowY: "scroll" }}>
-            <div
-              style={{
-                maxWidth: "800px",
-                margin: "0 auto",
-                padding: "2.5rem 2rem",
-              }}
-            >
-              <DocsContent doc={currentDoc} />
-            </div>
-          </div>
-        </main>
+      {/* Banner */}
+      <div className="docs-banner">
+        <img
+          src="/images/membership-card.jpg"
+          alt=""
+          className="docs-banner-img"
+        />
+        <div className="docs-banner-overlay" />
+        <div className="docs-banner-glow" />
+        <div className="docs-banner-content">
+          <h1>{t("docs.bannerTitle")}</h1>
+          <p>{t("docs.bannerDesc")}</p>
+        </div>
       </div>
 
-      <style>{`
-        .docs-content h1 {
-          font-size: 1.8rem;
-          color: #ffd700;
-          margin: 0 0 1.5rem;
-          padding-bottom: 0.8rem;
-          border-bottom: 1px solid rgba(191,161,74,0.2);
-        }
-        .docs-content h2 {
-          font-size: 1.3rem;
-          color: #fff;
-          margin: 2rem 0 1rem;
-          padding-left: 0.8rem;
-          border-left: 3px solid #bfa14a;
-        }
-        .docs-content h3 {
-          font-size: 1.1rem;
-          color: #eee;
-          margin: 1.5rem 0 0.8rem;
-        }
-        .docs-content p {
-          color: rgba(255,255,255,0.75);
-          line-height: 1.8;
-          margin: 0.8rem 0;
-          font-size: 0.95rem;
-        }
-        .docs-content a {
-          color: #ffd700;
-          text-decoration: none;
-          border-bottom: 1px solid rgba(255,215,0,0.3);
-          transition: border-color 0.2s;
-          word-break: break-all;
-        }
-        .docs-content a:hover {
-          border-bottom-color: #ffd700;
-        }
-        .docs-content strong {
-          color: #ffd700;
-          font-weight: 600;
-        }
-        .docs-content code {
-          background: rgba(191,161,74,0.1);
-          color: #ffd700;
-          padding: 2px 6px;
-          border-radius: 4px;
-          font-size: 0.85rem;
-        }
-        .docs-content blockquote {
-          border-left: 3px solid rgba(191,161,74,0.3);
-          margin: 1rem 0;
-          padding: 0.5rem 1rem;
-          background: rgba(191,161,74,0.05);
-          border-radius: 0 8px 8px 0;
-        }
-        .docs-content blockquote p {
-          color: rgba(255,255,255,0.6);
-          font-size: 0.9rem;
-        }
-        .docs-content ol, .docs-content ul {
-          padding-left: 1.5rem;
-          margin: 0.8rem 0;
-        }
-        .docs-content li {
-          color: rgba(255,255,255,0.75);
-          line-height: 2;
-          font-size: 0.95rem;
-        }
-        .docs-content hr {
-          border: none;
-          border-top: 1px solid rgba(191,161,74,0.15);
-          margin: 2rem 0;
-        }
-        .docs-content img {
-          max-width: 100%;
-          border-radius: 8px;
-          margin: 1rem auto;
-          display: block;
-          min-height: 200px;
-          background: rgba(191,161,74,0.05);
-          object-fit: contain;
-          cursor: zoom-in;
-        }
-        .docs-content table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 1rem 0;
-        }
-        .docs-content th, .docs-content td {
-          border: 1px solid rgba(191,161,74,0.15);
-          padding: 0.6rem 1rem;
-          text-align: left;
-        }
-        .docs-content th {
-          background: rgba(191,161,74,0.1);
-          color: #ffd700;
-        }
+      {/* 主体 */}
+      <main className="docs-main">
+        <div className="docs-container">
+          {/* 分类筛选 */}
+          <div className="docs-filters">
+            <button
+              className={`docs-filter-btn${!activeCategory ? " active" : ""}`}
+              onClick={() => setActiveCategory(undefined)}
+            >
+              {t("docs.all")}
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`docs-filter-btn${activeCategory === cat ? " active" : ""}`}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
 
-        .docs-content-scroll {
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        .docs-content-scroll::-webkit-scrollbar {
-          display: none;
-        }
-
-        @media (max-width: 768px) {
-          .docs-sidebar {
-            display: none !important;
-          }
-          .docs-sidebar[style*="fixed"] {
-            display: block !important;
-          }
-          .docs-mobile-menu-btn {
-            display: flex !important;
-          }
-          .docs-scroll-area {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-          .docs-scroll-area::-webkit-scrollbar {
-            display: none;
-          }
-        }
-      `}</style>
+          {/* 卡片网格 */}
+          <div className="docs-grid">
+            {filteredDocs.map((doc) => (
+              <div
+                key={doc.id}
+                className="docs-card"
+                onClick={() => navigate(`/docs/${doc.id}`)}
+              >
+                <div className="docs-card-header">
+                  <div className="docs-card-icon-wrap">
+                    <FileTextIcon />
+                  </div>
+                  <span className="docs-card-arrow">
+                    <ChevronRightIcon />
+                  </span>
+                </div>
+                <h3 className="docs-card-title">{doc.title}</h3>
+                <p className="docs-card-summary">{getSummary(doc.content)}</p>
+                <div className="docs-card-footer">
+                  <span className="docs-card-tag">{doc.category}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

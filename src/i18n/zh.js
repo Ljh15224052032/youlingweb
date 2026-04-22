@@ -18,6 +18,8 @@ export default {
     featureContract: '合约教学',
     featureContractDesc: '系统化合约交易教学，掌握专业交易策略与风控技巧',
     sectionTutorials: '新手教学',
+    marqueeRow1: '区块链   去中心化   智能合约   空投   DeFi   NFT   Web3   钱包   私钥   公链   Gas费   流动性   质押   哈希率   DAO   零知识证明   跨链桥   节点   共识机制   Layer2   代币经济学   链上治理   闪电网络   预言机   碎片化   熔铸   梅克尔树   非对称加密   分布式账本',
+    marqueeRow2: '分布式账本   非对称加密   梅克尔树   熔铸   碎片化   预言机   闪电网络   链上治理   代币经济学   Layer2   共识机制   节点   跨链桥   零知识证明   DAO   哈希率   质押   流动性   Gas费   公链   私钥   钱包   Web3   NFT   DeFi   空投   智能合约   去中心化   区块链',
     tutorialsDesc: '精选入门教程，从零开始了解 Web3 世界',
     readMore: '阅读全文 →',
     defaultTutorialTitle: '新手入门完整教程',
@@ -303,6 +305,17 @@ export default {
     pointsUnit: '积分',
     stock: '库存',
     moreWays: '更多赚取积分的方式即将开放',
+  },
+
+  // 策略文档
+  docs: {
+    bannerTitle: 'GHOST 策略文档库',
+    bannerDesc: '从入门到进阶的系统性交易策略指南',
+    backToHome: '← 返回首页',
+    backToList: '返回文档列表',
+    all: '全部',
+    prevDoc: '← 上一篇',
+    nextDoc: '下一篇 →',
   },
 
   // 语言切换

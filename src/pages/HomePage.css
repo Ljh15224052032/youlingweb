@@ -7,32 +7,6 @@
   overflow-x: hidden;
   position: relative;
 }
-.hp-particle-canvas {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 845px;
-  height: 659px;
-  pointer-events: none;
-  z-index: 100;
-}
-.hp-particle-glow {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 900px;
-  height: 900px;
-  background: radial-gradient(
-    circle,
-    rgba(191, 161, 74, 0.08) 0%,
-    rgba(191, 161, 74, 0.03) 30%,
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: 99;
-}
 
 /* ========== 导航栏 ========== */
 .hp-nav {
@@ -156,6 +130,7 @@
   font-weight: 400;
   color: #ffd700;
   letter-spacing: 8px;
+
   margin: 0 0 1rem;
   font-family: "Cinzel", serif;
   text-shadow: 0 4px 24px rgba(191, 161, 74, 0.3);
@@ -205,6 +180,16 @@
     transparent 70%
   );
   pointer-events: none;
+}
+.hp-hero-bg-img {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* ========== 通用 Section ========== */
@@ -275,6 +260,41 @@
   font-size: 0.9rem;
   line-height: 1.6;
   margin: 0;
+}
+
+/* ========== 滚动字幕墙 ========== */
+.hp-marquee-section {
+  position: relative;
+  z-index: 1;
+  padding: 3rem 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.hp-marquee-row {
+  overflow: hidden;
+  width: 100%;
+}
+.hp-marquee-track {
+  display: flex;
+  white-space: nowrap;
+  width: max-content;
+  will-change: transform;
+}
+.hp-marquee-word {
+  display: inline-block;
+  font-size: 1.65rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.15);
+  letter-spacing: 2px;
+  margin: 0 1.8rem;
+  cursor: pointer;
+  transition: color 0.8s ease-out;
+}
+.hp-marquee-word.flash {
+  color: rgba(0, 240, 255, 0.5);
+  transition: none;
 }
 
 /* ========== 教学卡片 ========== */
@@ -482,10 +502,6 @@
   }
 }
 @media (max-width: 768px) {
-  .hp-particle-canvas {
-    width: 364px;
-    height: 286px;
-  }
   .hp-nav {
     padding: 0 1.2rem;
   }
